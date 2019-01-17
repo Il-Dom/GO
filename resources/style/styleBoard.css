@@ -6,40 +6,25 @@
 }
 
 .row{
-	width: 0px;
-	height: 0px;
 	margin: 0px;
 	border: 0px;
 	padding: 0px;
 	display: block;
 }
 .boardCell{
-	margin: 0px;
-	border: 0px;
-	padding: 0px;
 	display: inline-block;
 	background-position:0px 0px;
 	background-repeat:no-repeat; 
-	background-size: cover;
-    -webkit-transform-origin: top left; /* Chrome */
+    border: 1px transparent !important;
     transform-origin: top left; /* IE 10+, Firefox, etc. */
+    -webkit-transform-origin: top left; /* Chrome */
     -ms-transform-origin: top left; /* IE 9 */    
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
 }
-.boardCell-rotate90 {
-    transform: rotate(90.001deg) translateY(-101%);
-    -webkit-transform: rotate(90deg) translateY(-100%);
-    -ms-transform: rotate(90deg) translateY(-100%);
-}
-.boardCell-rotate180 {
-    transform: rotate(180.001deg) translate(-101%,-101%);
-    -webkit-transform: rotate(180deg) translate(-100%,-100%);
-    -ms-transform: rotate(180deg) translateX(-100%,-100%);
-}
-.boardCell-rotate270 {
-    transform: rotate(270.001deg) translateX(-101%);
-    -webkit-transform: rotate(270deg) translateX(-100%);
-    -ms-transform: rotate(270deg) translateX(-100%);
-}
+
 
 .pawn{
 	border-radius: 50%;
