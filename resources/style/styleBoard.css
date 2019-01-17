@@ -24,6 +24,7 @@
 	transform-origin: top left; /* IE 10+, Firefox, etc. */
     -webkit-transform-origin: top left; /* Chrome */
     -ms-transform-origin: top left; /* IE 9 */
+    -webkit-backface-visibility: hidden;
 }
 .boardCell-rotate90 {
     transform: rotate(90deg) translateY(-100%);
@@ -47,3 +48,5 @@
 	visibility: hidden;
 	behavior: url(PIE.htc); /* remove if you don't care about IE8 */
 }
+
+
