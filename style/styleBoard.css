@@ -20,14 +20,26 @@
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+    text-align:center;
 }
 
 
 .pawn{
-	border-radius: 50%;
-	background: black;
+    margin: auto;
 	visibility: hidden;
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
 	behavior: url(PIE.htc); /* remove if you don't care about IE8 */
 }
-
-
+/*
+.pawn-white{
+    background-image:  url(../images/perla_bbianca.svg);
+}
+.pawn-black{
+    background-image:  url(../images/perla_nera.svg);
+}*/

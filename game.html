@@ -52,21 +52,33 @@
     
         
     var gameBoard;
-    
-    function cellListener(obj){
+    var bTurn = true;
+        
+    function clickListener(obj){
         
         var middle = Math.ceil(obj.id.length / 2);
         var x = parseInt(obj.id.slice(0,middle))-1;
         var y = parseInt(obj.id.slice(middle))-1;
         
         if ( !gameBoard [x][y]  ){
-            gameBoard[x][y] = 1;
-            $(obj).find('div:first').css('visibility','visible');
-            $(obj).unbind('mouseenter mouseleave');
+            if(bTurn){
+                gameBoard[x][y] = 1;
+                $(obj).find('div:first').css('background-image','url(images/perla_nera.svg)');
+                $(obj).find('div:first').css('visibility','visible');
+                $(obj).unbind('mouseenter mouseleave');
+            }
+            else{
+                gameBoard[x][y] = 2;
+                $(obj).find('div:first').css('background-image','url(images/perla_bbianca.svg)');
+                $(obj).find('div:first').css('visibility','visible');
+                $(obj).unbind('mouseenter mouseleave');
+            }
+            bTurn = !bTurn;
         }
-        
         //console.log(x + " - " + y);
     }    
+    
+
         
 	function createBoard(dimen){
 		var boardW = $('#board').width();
@@ -96,18 +108,25 @@
 				pawn.className = 'pawn';
 				pawn.style.width = size;
 				pawn.style.height = size;
-
+                
 				cell.appendChild(pawn);
 
                 /*handler functions*/
 				$(cell).hover(function(){
+                    if(bTurn){
+                        $(this).find('div:first').css('background-image','url(images/perla_nera.svg)');
+                    }
+                    else{
+                        $(this).find('div:first').css('background-image','url(images/perla_bbianca.svg)');
+                    }
+                    
 					$(this).find('div:first').css('visibility','visible');
 				},function(){
 					$(this).find('div:first').css('visibility','hidden');
 				});
 
                 $(cell).on('click',function(){
-                   cellListener(this); 
+                   clickListener(this); 
                 });
                 
 				row.appendChild(cell); 
