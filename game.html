@@ -23,7 +23,7 @@
         if ( acc === undefined || acc.length == 0){
             acc.push(pos);
         }
-        else if ( !acc.includes(pos) ){
+        else if ( !acc.some(e => e.x === pos.x && e.y===pos.y) ){
             acc.push(pos);
         }
         else{
@@ -96,9 +96,6 @@
                 $(obj).unbind('mouseenter mouseleave');
                 
                 var group = findGroups( new Array(),{'x': x, 'y': y}, 1);
-                console.log(group);
-                //var prova = [];
-                //console.log(findGroups(prova, {'x': x,'y': y}) ,1);
             }
             else{
                 gameBoard[x][y] = 2;
@@ -117,7 +114,7 @@
 		var boardH = $('#board').height();
 		var size = boardW/dimen;
 		gameBoard = new Array(dimen).fill(dimen).map(() => new Array(dimen).fill(0));
-        //console.log(gameBoard);
+
         
 		for(var r = 1; r <= dimen; r++){
 			var row = document.createElement("div"); 
