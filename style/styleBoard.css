@@ -1,0 +1,33 @@
+#board{
+    width: 760px;
+    height: 760px;
+	display: block;
+}
+
+.row{
+    width: 100%;
+    margin: 0;
+    display: block;
+    overflow: hidden;
+}
+.boardCell{	
+    margin: 0;
+    display: inline-block;
+    /*outline: 1px transparent !important;*/
+	background-position:0px 0px;
+	background-repeat:no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+
+.pawn{
+	border-radius: 50%;
+	background: black;
+	visibility: hidden;
+	behavior: url(PIE.htc); /* remove if you don't care about IE8 */
+}
+
+
