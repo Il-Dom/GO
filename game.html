@@ -14,6 +14,38 @@
     <!-- JavaScript code -->
 	<script type="text/javascript">
 	var res = "images/"
+    var gameBoard;
+    var bTurn = true;
+    
+        
+    function findGroups(acc, pos, color){
+        
+        if ( acc === undefined || acc.length == 0){
+            acc.push(pos);
+        }
+        else if ( !acc.includes(pos) ){
+            acc.push(pos);
+        }
+        else{
+            return acc;
+        }
+    
+        if( gameBoard[pos.x+1][pos.y] == color && pos.x < gameBoard[0].length){
+            acc=findGroups(acc,{'x':pos.x+1,'y':pos.y},color);
+        }
+        if( gameBoard[pos.x][pos.y-1] == color && pos.y >= 0){
+            acc=findGroups(acc,{'x':pos.x,'y':pos.y-1},color);
+        }
+        if( gameBoard[pos.x-1][pos.y] == color && pos.x >= 0){
+            acc=findGroups(acc,{'x':pos.x-1,'y':pos.y},color);
+        }
+        if( gameBoard[pos.x][pos.y+1] == color && pos.y < gameBoard[0].length){
+            acc=findGroups(acc,{'x':pos.x,'y':pos.y+1},color);
+        }
+            
+        return acc;
+    }
+        
 	function retrieveImage( cell, x, y, img, dimen ){
 		var corner = "url(\""+res + img +"-corner.png\")";
 		var edge = "url(\""+res + img +"-edge.png\")";
@@ -49,10 +81,6 @@
 			cell.style.backgroundImage = edge;
 		}
 	}
-    
-        
-    var gameBoard;
-    var bTurn = true;
         
     function clickListener(obj){
         
@@ -60,12 +88,17 @@
         var x = parseInt(obj.id.slice(0,middle))-1;
         var y = parseInt(obj.id.slice(middle))-1;
         
-        if ( !gameBoard [x][y]  ){
+        if ( gameBoard [x][y] == 0 ){
             if(bTurn){
                 gameBoard[x][y] = 1;
                 $(obj).find('div:first').css('background-image','url(images/perla_nera.svg)');
                 $(obj).find('div:first').css('visibility','visible');
                 $(obj).unbind('mouseenter mouseleave');
+                
+                var group = findGroups( new Array(),{'x': x, 'y': y}, 1);
+                console.log(group);
+                //var prova = [];
+                //console.log(findGroups(prova, {'x': x,'y': y}) ,1);
             }
             else{
                 gameBoard[x][y] = 2;
@@ -75,7 +108,6 @@
             }
             bTurn = !bTurn;
         }
-        //console.log(x + " - " + y);
     }    
     
 
