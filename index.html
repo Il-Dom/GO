@@ -1,0 +1,71 @@
+<html>
+<head>
+	<!-- external libraries -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- bootstrap for dynamic and responsive html pages -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+	<!-- stylesheet -->
+	<link rel="stylesheet" type="text/css" href="style/styleIndex.css">
+
+	<!-- JavaScript code -->
+	<script type="text/javascript">
+		
+		jQuery.fn.clickToggle = function(a,b) {
+		  function cb(){ [b,a][this._tog^=1].call(this); }
+		  return this.on("click", cb);
+		};
+
+		$(document).ready(function(){
+			$('#hostgame').css('background-image','url(images/hostgame.svg)')
+			$('#playgame').css('background-image','url(images/search.svg)')
+			
+			$('#infohost').hide()
+			$('#infoplayer').hide()
+			
+			$('#hostgame').on('click',function(){
+				$('#toggle-play').slideToggle("slow",function(){})
+				$('#infohost').toggle('slow')
+			})
+			
+			
+			$('#playgame').on('click',function(){
+				$('#toggle-host').slideToggle("slow",function(){})
+				
+				$('#infoplayer').toggle('slow')
+			})
+		});
+	</script>
+
+	<title>
+	what is the rudest type of elf? a GOfuckyourself
+	</title>
+	<meta content="">
+</head>
+<body>
+	<div class="graypage">
+		<div class="whitepage">
+			<div class="divContainer">
+				<div id="toggle-host">
+					<button id="hostgame" class="buttonContainer">Host a game</button>
+					<div id="infohost" class="infodiv">
+						<div class="group">      
+							<input type="text" required>
+							<span class="highlight"></span>
+							<span class="bar"></span>
+							<label>Insert your name:</label>
+						 </div>
+					</div>	
+				</div>
+				<div id="toggle-play">
+					<button id="playgame" class="buttonContainer">Search for a game</button>
+					<div id="infoplayer" class="infodiv"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
