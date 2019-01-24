@@ -1,0 +1,60 @@
+#board{
+    width: 760px;
+    height: 760px;
+	display: block;
+	position:absolute;
+}
+
+.row{
+    width: 100%;
+    margin: 0;
+    display: block;
+    overflow: hidden;
+}
+.boardCell{	
+    margin: 0;
+    display: inline-block;
+    /*outline: 1px transparent !important;*/
+	background-position:0px 0px;
+	background-repeat:no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    text-align:center;
+}
+
+
+.pawn{
+    margin: auto;
+	visibility: hidden;
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+	behavior: url(PIE.htc); /* remove if you don't care about IE8 */
+}
+
+.disabled{
+	opacity: 0.2;
+	background: #CCC;
+}
+
+.toInsert{
+	z-index: 1;
+	position: absolute;
+	opacity: 1; 
+	font-size: 50px;
+	color: black;
+	letter-spacing: 2px;
+}
+/*
+.pawn-white{
+    background-image:  url(../images/perla_bbianca.svg);
+}
+.pawn-black{
+    background-image:  url(../images/perla_nera.svg);
+}*/

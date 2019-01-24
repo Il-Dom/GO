@@ -1,0 +1,192 @@
+<html>
+<head>
+	<!-- external libraries -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- bootstrap for dynamic and responsive html pages -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+	<!-- stylesheet -->
+	<link rel="stylesheet" type="text/css" href="style/styleIndex.css">
+
+	<!-- JavaScript code -->
+	<script type="text/javascript">
+		
+
+
+		jQuery.fn.clickToggle = function(a,b) {
+		  function cb(){ [b,a][this._tog^=1].call(this); }
+		  return this.on("click", cb);
+		};
+
+
+		function setupHandlers(){
+			$('#hostgame').css('background-image','url(images/hostgame.svg)')
+			$('#playgame').css('background-image','url(images/search.svg)')
+			
+			$('#infohost').hide()
+			$('#infoplayer').hide()
+
+			$('#hostgame').on('click',function(){
+				$('#toggle-play').slideToggle("slow",function(){})
+				$('#infohost').toggle('slow')
+			})
+			
+			var toggled = false
+			$('#playgame').on('click',function(){
+				if(!toggled){
+					$.ajax({
+						type: 'get',
+						url: "http://127.0.0.1:8899/GO",
+						dataType: "json",
+						success: function(data){
+							$(data).each(function(i, item){
+								//console.log(item.Id)
+								$('#infoplayer').append(item.Id+'<br>')
+							})
+							toggled = true
+						},
+						complete: function(){
+							$('#infoplayer').toggle('slow')
+						}
+					})
+				}
+				else{
+					toggled = false
+					$('#infoplayer').toggle('slow')
+					$('#infoplayer').text('')
+					
+				}
+				$('#toggle-host').slideToggle("slow",function(){})
+				
+				
+			})
+
+		
+			$('#createHost').on('click',function(){
+				registerPeer()
+			})
+
+
+			$("#peerId").bind("keypress", {}, keypressInBox);	
+			
+			function keypressInBox(e) {
+				var code = (e.keyCode ? e.keyCode : e.which);
+				if (code == 13) { //Enter keycode                        
+					e.preventDefault();
+					registerPeer()
+				}
+			};
+		}
+
+		function sendPOSTtoServer (){	
+			if($('#peerId').val() != ''){						
+				$.ajax({
+					type:'post',
+					url: "http://127.0.0.1:8899/GO",
+					dataType: "text/plain",
+					data: JSON.stringify({ "id":  $('#peerId').val() }),
+					error: function(a,b,c){
+						console.log(a)
+					}
+				})
+
+				var connectionID = $('#peerId').val()
+				sessionStorage.setItem("connectionID",connectionID)
+				location.href="game.html"
+			}
+			else{
+				$('#message').css('color','red')
+				setTimeout(function(){
+					$('#message').css('color','#999')
+				},1000)
+			}
+		}		
+
+		function registerPeer (){
+			var myPeerId = $('#peerId').val() 
+			$.ajax({
+				type: 'get',
+				url: "http://127.0.0.1:8899/GO",
+				dataType: "json", // return data type
+				success: function(data){
+					var peerIsOk = true
+					
+					if (data.length!=0) {
+					
+						//check if the choosen peer id is in the list
+						data.forEach((item) => {
+							Object.entries(item).forEach(([key, val]) => {
+							console.log('entro' + myPeerId +" - item peer - "+ item.Id)
+							if ( myPeerId == item.Id ){
+								console.log("peer uguali")
+							// user must change the peer id
+								peerIsOk = false
+							}
+							});
+						});
+						
+						console.log(peerIsOk)
+						// if the choosen peer id is unique then send the post request
+						if (peerIsOk == true) {
+							sendPOSTtoServer()
+						}
+						else{
+							console.log("Ho trovato uno stronzo che prova a chiamarsi come un altro stronzo")
+							$('#message').css('color','red')
+							$("#message").text("Name already registered")
+							setTimeout(function(){
+								$('#message').css('color','#999')
+								$('#message').text( "Insert your name")
+								$('#peerId').val("")
+							},2000)
+
+						}
+					
+					} 
+					else{
+						sendPOSTtoServer()
+					}
+				}
+			})
+		}
+
+		$(document).ready(function(){
+			setupHandlers()
+		});
+
+	</script>
+
+	<title>
+	what is the rudest type of elf? a GOfuckyourself
+	</title>
+	<meta content="">
+</head>
+<body>
+	<div class="graypage">
+		<div class="whitepage">
+			<div class="divContainer">
+				<div id="toggle-host">
+					<button id="hostgame" class="buttonContainer">Host a game</button>
+					<div id="infohost" class="infodiv">
+						<div class="group">      
+							<input id="peerId" type="text" required>
+							<span class="highlight"></span>
+							<span class="bar"></span>
+							<label id='message'>Insert your name</label>
+						 </div>
+
+						 <button id="createHost">submit</button>
+					</div>	
+				</div>
+				<div id="toggle-play">
+					<button id="playgame" class="buttonContainer">Search for a game</button>
+					<div id="infoplayer" class="infodiv"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
