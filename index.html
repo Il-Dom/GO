@@ -1,5 +1,8 @@
-<html>
+<html >
 <head>
+
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
 	<!-- external libraries -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -66,7 +69,7 @@
 
 		
 			$('#createHost').on('click',function(){
-				sendPOSTtoServer()
+				registerPeer()
 			})
 
 
@@ -76,7 +79,7 @@
 				var code = (e.keyCode ? e.keyCode : e.which);
 				if (code == 13) { //Enter keycode                        
 					e.preventDefault();
-					sendPOSTtoServer()
+					registerPeer();
 				}
 			};
 		}
@@ -99,7 +102,59 @@
 					$('#message').css('color','#999')
 				},1000)
 			}
-		}		
+
+			alert("da qua in poi ci pensa domenico")
+		}	
+
+
+		function registerPeer (){
+			var myPeerId = $('#peerId').val() 
+			$.ajax({
+				type: 'get',
+				url: "http://127.0.0.1:8899/GO",
+				dataType: "json", // return data type
+				success: function(data){
+					var peerIsOk = true
+					
+					if (data.length!=0) {
+					
+						//check if the choosen peer id is in the list
+						data.forEach((item) => {
+							Object.entries(item).forEach(([key, val]) => {
+								console.log('entro' + myPeerId +" - item peer - "+ item.Id)
+								if ( myPeerId == item.Id ){
+									console.log("peer uguali")
+								// user must change the peer id
+									peerIsOk = false
+								}
+							});
+						});
+					
+						console.log(peerIsOk)
+						// if the choosen peer id is unique then send the post request
+						if (peerIsOk == true) {
+							sendPOSTtoServer()
+						}else{
+							console.log("Ho trovato uno stronzo che prova a chiamarsi come un altro stronzo")
+							$('#message').css('color','red')
+							$("#message").text("Name already registered")
+							setTimeout(function(){
+									$('#message').css('color','#999')
+									$('#message').text( "Insert your name")
+									$('#peerId').val("")
+							},2000)
+
+						}
+					
+					} 
+					else{
+						sendPOSTtoServer()
+					}
+					
+	
+				}
+			})
+		}	
 
 
 		$(document).ready(function(){
