@@ -48,12 +48,14 @@
 	display: block;
 }
 .infodiv{
-	height: 100px;
+	height: auto;
 	display: flex;
 	align-items: center;
 	margin-top: 30px;
 	border-radius: 12px;
 	border-bottom: 3px solid #ccc;
+	padding-left: 5%; 
+	overflow: visible;
 }
 
 /*material buttons*/
@@ -67,6 +69,8 @@ input{
 	width:300px;
 	border:none;
 	border-bottom:1px solid #757575;
+	overflow: auto;
+	
 }
 input:focus{ 
 	outline:none; 

@@ -14,30 +14,97 @@
 	<!-- JavaScript code -->
 	<script type="text/javascript">
 		
+
+
 		jQuery.fn.clickToggle = function(a,b) {
 		  function cb(){ [b,a][this._tog^=1].call(this); }
 		  return this.on("click", cb);
 		};
 
-		$(document).ready(function(){
+
+		function setupHandlers(){
 			$('#hostgame').css('background-image','url(images/hostgame.svg)')
 			$('#playgame').css('background-image','url(images/search.svg)')
 			
 			$('#infohost').hide()
 			$('#infoplayer').hide()
 			
+
+
 			$('#hostgame').on('click',function(){
 				$('#toggle-play').slideToggle("slow",function(){})
 				$('#infohost').toggle('slow')
 			})
 			
-			
+			var toggled = false
 			$('#playgame').on('click',function(){
+				if(!toggled){
+				
+					$.ajax({
+						type: 'get',
+						url: "http://127.0.0.1:8899/GO",
+						dataType: "json",
+						success: function(data){
+							$(data).each(function(i, item){
+								//console.log(item.Id)
+								$('#infoplayer').append(item.Id+'<br>')
+							})
+							toggled = true
+						},
+						complete: function(){
+							$('#infoplayer').toggle('slow')
+						}
+					})
+				}
+				else{
+					toggled = false
+					$('#infoplayer').toggle('slow')
+					$('#infoplayer').text('')
+					
+				}
 				$('#toggle-host').slideToggle("slow",function(){})
 				
-				$('#infoplayer').toggle('slow')
+				
 			})
+
+		
+			$('#createHost').on('click',function(){
+				
+				$.ajax({
+					type:'post',
+					url: "http://127.0.0.1:8899/GO",
+					dataType: "text/plain",
+					data: JSON.stringify({ "id":  $('#peerId').val() }),
+					error: function(a,b,c){
+						console.log(a)
+					}
+				})
+			})
+
+
+			$("#peerId").bind("keypress", {}, keypressInBox);	
+			
+			function keypressInBox(e) {
+				var code = (e.keyCode ? e.keyCode : e.which);
+				if (code == 13) { //Enter keycode                        
+					e.preventDefault();
+
+					console.log($("#peerId").val())
+				}
+			};
+		}
+		$(document).ready(function(){
+
+
+
+			setupHandlers()
+
+
+
 		});
+
+
+
 	</script>
 
 	<title>
@@ -53,10 +120,11 @@
 					<button id="hostgame" class="buttonContainer">Host a game</button>
 					<div id="infohost" class="infodiv">
 						<div class="group">      
-							<input type="text" required>
+							<input id="peerId" type="text" required>
 							<span class="highlight"></span>
 							<span class="bar"></span>
 							<label>Insert your name:</label>
+							<button id="createHost"></button>
 						 </div>
 					</div>	
 				</div>
