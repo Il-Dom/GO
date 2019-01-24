@@ -43,8 +43,15 @@
 						dataType: "json",
 						success: function(data){
 							$(data).each(function(i, item){
-								//console.log(item.Id)
-								$('#infoplayer').append(item.Id+'<br>')
+								var hostingPlayer = $('<div>'+item.Id+'</div>')
+								hostingPlayer.addClass('gridCell')
+								hostingPlayer.on('click',function(){
+									var connectionID = 'prova'
+									sessionStorage.setItem("connectionID",connectionID)
+									sessionStorage.setItem("otherID",item.Id)
+									location.href="game.html"
+								})
+								hostingPlayer.appendTo($('#infoplayer'))
 							})
 							toggled = true
 						},
@@ -142,9 +149,7 @@
 								$('#message').text( "Insert your name")
 								$('#peerId').val("")
 							},2000)
-
 						}
-					
 					} 
 					else{
 						sendPOSTtoServer()
@@ -154,7 +159,9 @@
 		}
 
 		$(document).ready(function(){
+			$('#infoplayer').css('display','grid').css( 'grid-template-columns',' auto auto')
 			setupHandlers()
+
 		});
 
 	</script>

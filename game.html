@@ -2,7 +2,8 @@
 <head>
     <!-- external libraries -->
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.9/peer.min.js"></script>
+	
     <!-- bootstrap for dynamic and responsive html pages -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
@@ -168,25 +169,64 @@
         return n > 9 ? "" + n: "0" + n;
     }
 
-        
+	function grayBoard(message){
+		$("#board *").prop('disabled',true).off('click')
+		$("#board").addClass('disabled')
+		$(".pawn").hide()
+
+		var toInsert = $('<div id=\'errordiv\'>'+message+'</div>')
+		var loc = $('#board').offset()
+		toInsert.appendTo('#wrapper')
+		toInsert.addClass('toInsert')
+		toInsert.css('top', ($('#board').outerHeight()- toInsert.height())/2 + loc.top + 'px')
+		toInsert.css('left', ($('#board').outerWidth() - toInsert.width())/2 + loc.left + 'px')
+	}
+
+	function ungrayBoard(message){
+		$("#board *").prop('disabled',false).on('click')
+		$("#board").removeClass('disabled')
+		$(".pawn").show()
+
+		$('#errordiv').remove()
+	}
+    var peer,conn;  
 	$(document).ready(function(){
-		console.log(sessionStorage.getItem('connectionID'))
 		createBoard(19);
+		
+		var myID = sessionStorage.getItem('connectionID')
+		var otherID = sessionStorage.getItem('otherID')
 
-		if(sessionStorage.getItem('connectionID') == null){
-			console.log("entro")
-			$("#board *").prop('disabled',true).off('click')
-			$("#board").addClass('disabled')
-			$(".pawn").hide()
-
-
-			var toInsert = $('<div id=\'errordiv\'>Invalid ID</div>')
-			var loc = $('#board').offset()
-			toInsert.appendTo('#wrapper')
-			toInsert.addClass('toInsert')
-			toInsert.css('top', ($('#board').outerHeight()- toInsert.height())/2 + loc.top + 'px')
-			toInsert.css('left', ($('#board').outerWidth() - toInsert.width())/2 + loc.left + 'px')
+		if( myID == null ){
+			grayBoard('Invalid ID')
 		}
+		else{
+			peer = new Peer(myID)
+			console.log('created peer '+myID)
+			
+			if(otherID != null){
+				console.log("I have to connect")
+				conn = peer.connect(otherID)
+				conn.on( 'open', function(){
+					conn.send(myID)
+					console.log('message sent '+myID)
+				})
+			}
+			else{
+				console.log('waiting for peer')
+				grayBoard('Waiting for player...')
+
+				peer.on('connection', function(c) {
+					conn = c
+					conn.on('data', function(data) {
+						otherID = data
+						console.log('connection established with '+otherID)
+						ungrayBoard()
+					});
+				})
+			}
+		}
+		
+		
 	});
 	</script>
 
