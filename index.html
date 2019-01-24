@@ -28,8 +28,6 @@
 			
 			$('#infohost').hide()
 			$('#infoplayer').hide()
-			
-
 
 			$('#hostgame').on('click',function(){
 				$('#toggle-play').slideToggle("slow",function(){})
@@ -39,7 +37,6 @@
 			var toggled = false
 			$('#playgame').on('click',function(){
 				if(!toggled){
-				
 					$.ajax({
 						type: 'get',
 						url: "http://127.0.0.1:8899/GO",
@@ -69,16 +66,7 @@
 
 		
 			$('#createHost').on('click',function(){
-				
-				$.ajax({
-					type:'post',
-					url: "http://127.0.0.1:8899/GO",
-					dataType: "text/plain",
-					data: JSON.stringify({ "id":  $('#peerId').val() }),
-					error: function(a,b,c){
-						console.log(a)
-					}
-				})
+				sendPOSTtoServer()
 			})
 
 
@@ -88,21 +76,35 @@
 				var code = (e.keyCode ? e.keyCode : e.which);
 				if (code == 13) { //Enter keycode                        
 					e.preventDefault();
-
-					console.log($("#peerId").val())
+					sendPOSTtoServer()
 				}
 			};
 		}
+
+		function sendPOSTtoServer (){	
+			if($('#peerId').val() != ''){						
+				$.ajax({
+					type:'post',
+					url: "http://127.0.0.1:8899/GO",
+					dataType: "text/plain",
+					data: JSON.stringify({ "id":  $('#peerId').val() }),
+					error: function(a,b,c){
+						console.log(a)
+					}
+				})
+			}
+			else{
+				$('#message').css('color','red')
+				setTimeout(function(){
+					$('#message').css('color','#999')
+				},1000)
+			}
+		}		
+
+
 		$(document).ready(function(){
-
-
-
 			setupHandlers()
-
-
-
 		});
-
 
 
 	</script>
@@ -123,9 +125,10 @@
 							<input id="peerId" type="text" required>
 							<span class="highlight"></span>
 							<span class="bar"></span>
-							<label>Insert your name:</label>
-							<button id="createHost"></button>
+							<label id='message'>Insert your name</label>
 						 </div>
+
+						 <button id="createHost">submit</button>
 					</div>	
 				</div>
 				<div id="toggle-play">
