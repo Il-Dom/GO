@@ -4,7 +4,7 @@
     Require browserify, budo, simple-peer
 
 TODO:
-    -gestire connessioni in caso di due peername identici
-    -rendirizzare alla pagina di gioco
+    -gestire connessioni in caso di due peername identici <br>
+    -rendirizzare alla pagina di gioco<br>
     -tirare su la connessione p2p nella pagina con il goban
     
