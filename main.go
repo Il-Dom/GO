@@ -26,15 +26,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 
 	case "GET":        
-        fmt.Println("Ricevuto una richiesta")
-        fmt.Println("sending data back")
+        fmt.Println("GET request Received on /GO")
         jsonMsg,_ := json.Marshal(peerIds)
         w.WriteHeader(http.StatusOK)
         fmt.Fprintf(w, "%s", jsonMsg)
         
 
     case "POST":
-        fmt.Println("Ricevuto una richiesta post")
 		/*
          aggiungo l'id del peer allo slice
         */
@@ -78,7 +76,7 @@ func handler2(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 
          case "POST":
-            fmt.Println("Ricevuto una richiesta post su removePeer")
+            fmt.Println("POST request Received on /removePeer")
             /*
             rimuovo l'id del peer dallo slice
             */
@@ -97,7 +95,7 @@ func handler2(w http.ResponseWriter, r *http.Request) {
                 http.Error(w, err.Error(), http.StatusBadRequest)
                 return
             }
-            fmt.Println("Received " + msgRcv.Id + " from POST request on /removePeer")
+            fmt.Println("Removing  " + msgRcv.Id + " from peer list")
             
             peerIds, ischange = remove (peerIds,msgRcv)
             
@@ -122,7 +120,7 @@ func remove(s []peer, r peer) ([]peer,bool) {
     ischange := false
     for i, v := range s {
         if v == r {
-            fmt.Printf (v.Id + " is equal to " + r.Id)
+            //fmt.Printf (v.Id + " is equal to " + r.Id)
             //non gli piace sta roba 
             ischange = true;
             return append(s[:i], s[i+1:]...),ischange
@@ -149,7 +147,7 @@ func handler3(w http.ResponseWriter, r *http.Request) {
 
 
     case "POST":
-        fmt.Println("Ricevuto una richiesta post su removeAllPeers")
+        fmt.Println("POST request Received on /removeAllPeers")
 		/*
          aggiungo l'id del peer allo slice
         */
@@ -169,10 +167,10 @@ func handler3(w http.ResponseWriter, r *http.Request) {
             return
         }
         
-        fmt.Println("Received " + msgRcv.Id + " from POST request on /removeAllPeers")
-        
         if msgRcv.Id == "sudo" {
 //             //clear peerIds
+                fmt.Println("Request OK removing all peers")
+        
                 peerIds = peerIds[:0]
         }
 

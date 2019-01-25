@@ -16,7 +16,8 @@
 	<script type="text/javascript">
 	var res = "images/"
     var gameBoard;
-    var bTurn = true;
+    var pawnColor;
+	/*cambiare nome e valore pawnColor*/
     
         
     function findGroups(acc, pos, color){
@@ -90,7 +91,7 @@
         var y = parseInt(obj.id.slice(middle))-1;
         
         if ( gameBoard [x][y] == 0 ){
-            if(bTurn){
+            if(turn==0){
                 gameBoard[x][y] = 1;
                 $(obj).find('div:first').css('background-image','url(images/perla_nera.svg)');
                 $(obj).find('div:first').css('visibility','visible');
@@ -104,12 +105,11 @@
                 $(obj).find('div:first').css('visibility','visible');
                 $(obj).unbind('mouseenter mouseleave');
             }
-            bTurn = !bTurn;
         }
     }    
-    
 
-        
+	
+      
 	function createBoard(dimen){
 		var boardW = $('#board').width();
 		var boardH = $('#board').height();
@@ -143,7 +143,7 @@
 
                 /*handler functions*/
 				$(cell).hover(function(){
-                    if(bTurn){
+                    if(pawnColor){
                         $(this).find('div:first').css('background-image','url(images/perla_nera.svg)');
                     }
                     else{
@@ -165,7 +165,7 @@
 		}
 	}
     
-     function digify(n){
+    function digify(n){
         return n > 9 ? "" + n: "0" + n;
     }
 
@@ -189,45 +189,96 @@
 
 		$('#errordiv').remove()
 	}
-    var peer,conn;  
+    
+	function sendPOSTforPeerIdEliminationtoServer ( peerToRemove ){
+		if (peerToRemove != null){
+			$.ajax({
+				type:'post',
+				url: "http://127.0.0.1:8899/removePeer",
+				dataType: "text/plain",
+				data: JSON.stringify({ "id":  peerToRemove }),
+				error: function(a,b,c){
+					console.log(c)
+				}
+			})
+		}			
+			
+	}	
+
+	var peer,conn,turn;  
+
 	$(document).ready(function(){
 		createBoard(19);
 		
 		var myID = sessionStorage.getItem('connectionID')
-		var otherID = sessionStorage.getItem('otherID')
+		var otherID =  sessionStorage.getItem('otherID') 
 
 		if( myID == null ){
 			grayBoard('Invalid ID')
 		}
 		else{
 			peer = new Peer(myID)
-			console.log('created peer '+myID)
-			
+			console.log('created peer '+ myID)
+
 			if(otherID != null){
-				console.log("I have to connect")
+				console.log("I have to connect with" + otherID)
+				
 				conn = peer.connect(otherID)
-				conn.on( 'open', function(){
-					conn.send(myID)
-					console.log('message sent '+myID)
+				conn.send(myID)
+				
+				console.log('hi ' + otherID + ' I am '+ myID)
+				pawnColor=false
+
+				conn.on('data', function(data){
+					console.log(data)
 				})
+				
 			}
 			else{
 				console.log('waiting for peer')
 				grayBoard('Waiting for player...')
 
 				peer.on('connection', function(c) {
+					pawnColor = true;
+					
 					conn = c
-					conn.on('data', function(data) {
+					conn.on('open',function(data) {
 						otherID = data
 						console.log('connection established with '+otherID)
 						ungrayBoard()
+						sendPOSTforPeerIdEliminationtoServer(myID)
+					})
+					
+					conn.on('data', function(data) {
+						console.log(data)
 					});
 				})
 			}
 		}
-		
+
+		$('#disconnect').on('click',function(){
+			
+			/*alert("sending elimination request to server")
+			
+			
+			conn.send("Sorry " + otherID + "I've to disconnect myself " + myID)
+			
+
+			console.log('message sent '+ myID)
+			alert("disconnectiong peer")
+			conn.close() 
+			peer.disconnect()
+			peer.destroy()
+			location.href="index.html"*/
+			conn.send("Sorry mama for mi vida loca")
+
+		});
+
 		
 	});
+
+
+
 	</script>
 
 	<title>
@@ -239,5 +290,9 @@
     <div id = 'wrapper'>
 		<div id = 'board'> </div>
 	</div>
+
+<br>
+<br>
+<button id = "disconnect" style ="position:absolute; bottom:0;"> disconnect me </button>
 </body>
 </html>
