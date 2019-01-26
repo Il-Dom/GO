@@ -83,40 +83,42 @@
 			cell.style.backgroundImage = edge;
 		}
 	}
-        
+    
+	
     function clickListener(obj){
-        
         var middle = Math.ceil(obj.id.length / 2);
         var x = parseInt(obj.id.slice(0,middle))-1;
         var y = parseInt(obj.id.slice(middle))-1;
         
-        if ( gameBoard [x][y] == 0 ){
-            if(turn==0){
-                gameBoard[x][y] = 1;
-                $(obj).find('div:first').css('background-image','url(images/perla_nera.svg)');
-                $(obj).find('div:first').css('visibility','visible');
-                $(obj).unbind('mouseenter mouseleave');
-                
-                var group = findGroups( new Array(),{'x': x, 'y': y}, 1);
-            }
-            else{
-                gameBoard[x][y] = 2;
-                $(obj).find('div:first').css('background-image','url(images/perla_bbianca.svg)');
-                $(obj).find('div:first').css('visibility','visible');
-                $(obj).unbind('mouseenter mouseleave');
-            }
-        }
+		if(turn == pawnColor && gameBoard [x][y] == 0 ){
+			if(pawnColor == 0 ){
+				gameBoard[x][y] = 1;
+				$(obj).find('div:first').css('background-image','url(images/perla_nera.svg)');
+			}
+			else{
+				gameBoard[x][y] = 2;
+				$(obj).find('div:first').css('background-image','url(images/perla_bbianca.svg)');
+			}
+
+			$(obj).find('div:first').css('visibility','visible');
+			$(obj).unbind('mouseenter mouseleave');
+
+			//var group = findGroups( new Array(),{'x': x, 'y': y}, 1);
+			waitForResponse(turn)
+		}
     }    
 
-	
+	function waitForResponse(t){
+		conn.send({'turn':turn})
+		$("#board *").prop('disabled',true).off('click')
+	}
       
 	function createBoard(dimen){
 		var boardW = $('#board').width();
 		var boardH = $('#board').height();
 		var size = boardW/dimen;
 		gameBoard = new Array(dimen).fill(dimen).map(() => new Array(dimen).fill(0));
-
-        
+  
 		for(var r = 1; r <= dimen; r++){
 			var row = document.createElement("div"); 
 			row.className = "row";
@@ -143,7 +145,7 @@
 
                 /*handler functions*/
 				$(cell).hover(function(){
-                    if(pawnColor){
+                    if(turn){
                         $(this).find('div:first').css('background-image','url(images/perla_nera.svg)');
                     }
                     else{
@@ -156,7 +158,7 @@
 				});
 
                 $(cell).on('click',function(){
-                   clickListener(this); 
+					clickListener(this); 
                 });
                 
 				row.appendChild(cell); 
@@ -165,9 +167,7 @@
 		}
 	}
     
-    function digify(n){
-        return n > 9 ? "" + n: "0" + n;
-    }
+    function digify(n){ return n > 9 ? "" + n: "0" + n; }
 
 	function grayBoard(message){
 		$("#board *").prop('disabled',true).off('click')
@@ -182,11 +182,12 @@
 		toInsert.css('left', ($('#board').outerWidth() - toInsert.width())/2 + loc.left + 'px')
 	}
 
+
+
 	function ungrayBoard(message){
 		$("#board *").prop('disabled',false).on('click')
 		$("#board").removeClass('disabled')
 		$(".pawn").show()
-
 		$('#errordiv').remove()
 	}
     
@@ -207,30 +208,45 @@
 
 	var peer,conn,turn;  
 
+	function updateTurn(t){
+		/*controllo sul messaggio goes here*/
+		console.log('entro',t,'onesto')
+		turn = ( t+1 ) % 2
+		$("#board *").prop('disabled',false).on('click')
+	}
+
 	$(document).ready(function(){
 		createBoard(19);
 		
 		var myID = sessionStorage.getItem('connectionID')
 		var otherID =  sessionStorage.getItem('otherID') 
-
 		if( myID == null ){
 			grayBoard('Invalid ID')
 		}
 		else{
 			peer = new Peer(myID)
 			console.log('created peer '+ myID)
+			turn = 0
 
 			if(otherID != null){
-				console.log("I have to connect with" + otherID)
-				
+				console.log("I have to connect with", otherID)
 				conn = peer.connect(otherID)
-				conn.send(myID)
-				
-				console.log('hi ' + otherID + ' I am '+ myID)
-				pawnColor=false
 
-				conn.on('data', function(data){
-					console.log(data)
+				pawnColor = 1
+
+				conn.on('open', function(){
+					console.log('Hi ' + otherID + ' I am '+ myID, 'turn:',turn)
+					conn.send({'id': myID})
+
+				})
+
+
+				conn.on('data', function(t){
+					console.log(t)
+					if(t.turn != null){
+						updateTurn(t.turn)
+						console.log('Turno:',turn)
+					}
 				})
 				
 			}
@@ -238,19 +254,26 @@
 				console.log('waiting for peer')
 				grayBoard('Waiting for player...')
 
+				pawnColor = 0
 				peer.on('connection', function(c) {
-					pawnColor = true;
-					
 					conn = c
-					conn.on('open',function(data) {
-						otherID = data
-						console.log('connection established with '+otherID)
+					conn.on('open', function() {
+						console.log('established connection')
 						ungrayBoard()
 						sendPOSTforPeerIdEliminationtoServer(myID)
 					})
-					
-					conn.on('data', function(data) {
-						console.log(data)
+
+					conn.on( 'data', function(t){
+						console.log(t)
+						if(t.id != null){
+							otherID = t.id
+							console.log('connection established with ',otherID,'Turno:',turn,'PawnColor',pawnColor)
+						}
+						else if(t.turn != null){
+							turn = t.turn
+							console.log('Turno:',turn)
+							updateTurn(turn)
+						}
 					});
 				})
 			}
