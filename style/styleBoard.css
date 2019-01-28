@@ -24,7 +24,6 @@
     text-align:center;
 }
 
-
 .pawn{
     margin: auto;
 	visibility: hidden;
@@ -39,6 +38,10 @@
 }
 
 .disabled{
+	pointer-events:none;
+}
+
+.grayed{
 	opacity: 0.2;
 	background: #CCC;
 }
