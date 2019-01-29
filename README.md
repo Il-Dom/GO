@@ -1,7 +1,6 @@
 # GO
 
     Implementing Go over a p2p network with WebRTC
-    Require browserify, budo, simple-peer
 
 TODO urgenti:
     -controlla come funzionano i mutex in go per sincronizzare gli accessi
