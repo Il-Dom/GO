@@ -38,6 +38,28 @@ function sendPOSTtoServer (){
     }
 }	
 
+function getConnectedPeers(){
+	return $.ajax({
+		type: 'get',
+		url: urlServer+"/GO",
+		dataType: "json"
+	})
+}
+
+function appendGridCells(d){
+	$(d).each(function(i, item){
+		var hostingPlayer = $('<div>'+item.Id+'</div>')
+		hostingPlayer.addClass('gridCell')
+		hostingPlayer.on('click',function(){
+			var connectionID = makeid()
+			sessionStorage.setItem("connectionID",connectionID)
+			sessionStorage.setItem("otherID",item.Id)
+			location.href="game.html"
+		})
+		hostingPlayer.appendTo($('#infoplayer'))
+	})
+}
+
 function setupHandlers(){
     $('#hostgame').css('background-image','url(images/hostgame.svg)')
     $('#playgame').css('background-image','url(images/search.svg)')
@@ -52,35 +74,33 @@ function setupHandlers(){
     
     var toggled = false
     $('#playgame').on('click',function(){
+		var interVal;
+
+		var response = getConnectedPeers()
         if(!toggled){
-            $.ajax({
-                type: 'get',
-                url: urlServer+"/GO",
-                dataType: "json",
-                success: function(data){
-                    $(data).each(function(i, item){
-                        var hostingPlayer = $('<div>'+item.Id+'</div>')
-                        hostingPlayer.addClass('gridCell')
-                        hostingPlayer.on('click',function(){
-                            var connectionID = makeid()
-                            sessionStorage.setItem("connectionID",connectionID)
-                            sessionStorage.setItem("otherID",item.Id)
-                            location.href="game.html"
-                        })
-                        hostingPlayer.appendTo($('#infoplayer'))
-                    })
-                    toggled = true
-                },
-                complete: function(){
-                    $('#infoplayer').toggle('slow')
-                }
-            })
+			if($('infoplayer').children().length == 0){
+				$('#infoplayer').toggle('slow')
+				response.then( data => appendGridCells(data) ) 
+
+				toggled = true
+			}
+			
+			interVal = setInterval(function(){ 
+				var tmpPeers = getConnectedPeers()
+				tmpPeers.then(function(data){
+					if (data != response){
+						$('#infoplayer').children().remove()
+						appendGridCells(data)
+						response = tmpPeers
+					}
+				})
+			}, 2000); 
         }
         else{
             toggled = false
             $('#infoplayer').toggle('slow')
-            $('#infoplayer').text('')
-            
+			$('#infoplayer').text('')
+			clearInterval(interVal)
         }
         $('#toggle-host').slideToggle("slow",function(){})
         
@@ -150,8 +170,14 @@ function registerPeer (){
 }
 
 $(document).ready(function(){
+	$('#nav').load('../navBar.html')
+	var video = document.getElementById('vid')
+	var vidsrc = document.getElementById('vidSrc')
+	vidsrc.src = "video/intro.mov"
+	video.load()
+	video.play()
+
+
     $('#infoplayer').css('display','grid').css( 'grid-template-columns',' auto auto')
-    setupHandlers()
-
+	setupHandlers()
 });
-

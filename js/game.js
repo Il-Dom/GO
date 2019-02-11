@@ -232,7 +232,7 @@ $(document).ready(function(){
 	
 	var myID = sessionStorage.getItem('connectionID')
 	var otherID =  sessionStorage.getItem('otherID') 
-
+	
 	if( myID == null ){
 		grayBoard('Invalid ID')
 	}

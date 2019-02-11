@@ -1,22 +1,38 @@
 <html>
 	<head>
 		<!-- external libraries -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
 
 		<!-- stylesheet -->
 		<link rel="stylesheet" type="text/css" href="style/styleIndex.css">
+		<link rel="stylesheet" type="text/css" href="style/navBar.css">
 
 		<!-- JavaScript code -->
 		<script src="js/index.js"></script>
-
+		 
 		<title>
 		what is the rudest type of elf? a GOfuckyourself
 		</title>
 		<meta content="">
 	</head>
 	<body>
+		<div class="topnav">
+			<a href="index.html"><div class="active" >
+				<img src="images/logo.svg">
+			</div></a>
+			<a href="rules.html"><div>Rules</div></a>
+			<a href="about.html"><div>About</div></a>
+		</div>
+
+
 		<div class="graypage">
 			<div class="whitepage">
+				<div class="videoContainer">
+					<video autoplay muted loop type="video/mov" id="vid">
+						<source id="vidSrc">
+						Your Browser doesn't support video embedding
+					</video>
+				</div>
 				<div class="divContainer">
 					<div id="toggle-host">
 						<button id="hostgame" class="buttonContainer">Host a game</button>
