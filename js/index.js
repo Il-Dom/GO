@@ -6,6 +6,11 @@ jQuery.fn.clickToggle = function(a,b) {
   return this.on("click", cb);
 };
 
+/*
+*
+*   Make a random peer id for the peer which connect to an hosted game
+*
+*/
 function makeid() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -14,6 +19,11 @@ function makeid() {
     return text;
 }
 
+/**
+ * 
+ *  Send a post to host a game
+ * 
+ */
 function sendPOSTtoServer (){	
     if($('#peerId').val() != ''){						
         $.ajax({
@@ -38,6 +48,11 @@ function sendPOSTtoServer (){
     }
 }	
 
+/**
+ * 
+ *  Send a Get request to get all the hosted games
+ * 
+ */
 function getConnectedPeers(){
 	return $.ajax({
 		type: 'get',
@@ -46,6 +61,11 @@ function getConnectedPeers(){
 	})
 }
 
+/**
+ * 
+ * 
+ * 
+ */
 function appendGridCells(d){
 	$(d).each(function(i, item){
 		var hostingPlayer = $('<div>'+item.Id+'</div>')
@@ -60,6 +80,11 @@ function appendGridCells(d){
 	})
 }
 
+/**
+ * 
+ * 
+ * 
+ */
 function setupHandlers(){
     $('#hostgame').css('background-image','url(images/hostgame.svg)')
     $('#playgame').css('background-image','url(images/search.svg)')
@@ -123,6 +148,11 @@ function setupHandlers(){
 }
 
 
+/**
+ * 
+ *  Host a game
+ * 
+ */
 function registerPeer (){
     var myPeerId = $('#peerId').val() 
     $.ajax({

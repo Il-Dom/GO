@@ -3,10 +3,23 @@ var gameBoard
 var pawnColor
 var urlServer = "http://127.0.0.1:8899"
 var peer,conn,turn
-/*cambiare nome e valore pawnColor*/
+var debug = true
 
-function digify(n){ return n > 9 ? "" + n: "0" + n; }
 
+/*
+*
+*	Return a string rappresentation of n like "0Val" if val is <= 9
+*
+*/
+function digify(n){ 
+	return n > 9 ? "" + n: "0" + n
+}
+
+/*
+*
+*	Disconnect a peer from peerJs 
+*
+*/
 function peerDisconnect(){
 	console.log("disconnectiong peer")
 	conn.close()
@@ -14,37 +27,21 @@ function peerDisconnect(){
 	peer.destroy()
 }
 
+/*
+*
+*	Disable board while waiting for a response
+*
+*/
 function waitForResponse( pos ){
 	$("#board").addClass('disabled') //.prop('disabled',true).off('click')
 	conn.send( { 'turn':turn,'position':pos } )
 }
-
-function findGroups(acc, pos, color){
-	if ( acc === undefined || acc.length == 0){
-		acc.push(pos);
-	}
-	else if ( !acc.some(e => e.x === pos.x && e.y===pos.y) ){
-		acc.push(pos);
-	}
-	else{
-		return acc;
-	}
-
-	if( gameBoard[pos.x+1][pos.y] == color && pos.x < gameBoard[0].length){
-		acc=findGroups(acc,{'x':pos.x+1,'y':pos.y},color);
-	}
-	if( gameBoard[pos.x][pos.y-1] == color && pos.y >= 0){
-		acc=findGroups(acc,{'x':pos.x,'y':pos.y-1},color);
-	}
-	if( gameBoard[pos.x-1][pos.y] == color && pos.x >= 0){
-		acc=findGroups(acc,{'x':pos.x-1,'y':pos.y},color);
-	}
-	if( gameBoard[pos.x][pos.y+1] == color && pos.y < gameBoard[0].length){
-		acc=findGroups(acc,{'x':pos.x,'y':pos.y+1},color);
-	}
-	return acc;
-}
 	
+/*
+*
+*	Create the correct image for the goban div
+*
+*/
 function retrieveImage( cell, x, y, img, dimen ){
 	var corner = "url(\""+res + img +"-corner.png\")";
 	var edge = "url(\""+res + img +"-edge.png\")";
@@ -81,30 +78,11 @@ function retrieveImage( cell, x, y, img, dimen ){
 	}
 }
 
-
-function placePawn(obj){
-	var middle = Math.ceil( obj.length / 2);
-	var x = parseInt(obj.slice(0,middle))-1;
-	var y = parseInt(obj.slice(middle))-1;
-	
-	if( gameBoard [x][y] == 0 ){
-		if( turn == 0 ){
-			gameBoard[x][y] = 1;
-			$('#'+obj).find('div:first').css('background-image','url(images/perla_nera.svg)');
-		}
-		else{
-			gameBoard[x][y] = 2;
-			$('#'+obj).find('div:first').css('background-image','url(images/perla_bbianca.svg)');
-		}
-
-		$('#'+obj).find('div:first').css('visibility','visible');
-		$('#'+obj).unbind('mouseenter mouseleave');
-
-		//var group = findGroups( new Array(),{'x': x, 'y': y}, 1);
-		if(turn == pawnColor) waitForResponse( obj )
-	}
-}    
-
+/*
+*
+*	Setup page handlers
+*
+*/
 function setUpHandlers(){
 	$(document).unload(function () {
 		peerDisconnect();
@@ -171,6 +149,11 @@ function createBoard(dimen){
 	}
 }
 
+/*
+*
+*	Gray board 
+*
+*/
 function grayBoard(message){
 	$("#board").addClass('disabled').addClass('grayed')
 	$(".pawn").hide()
@@ -183,12 +166,22 @@ function grayBoard(message){
 	toInsert.css('left', ($('#board').outerWidth() - toInsert.width())/2 + loc.left + 'px')
 }
 
+/*
+*
+*	ungray board 
+*
+*/
 function ungrayBoard(){
 	$("#board").removeClass('disabled').removeClass('grayed')
 	$(".pawn").show()
 	$('#errordiv').remove()
 }
 
+/*
+*	
+*	Send a Post request for deleting host id from the server
+*
+*/
 function sendPOSTforPeerIdEliminationtoServer ( peerToRemove ){
 	if (peerToRemove != null){
 		$.ajax({
@@ -210,20 +203,35 @@ function onConnectionOpen(mine, other){
 	$('#board').addClass('disabled')
 }
 
+/*
+*
+*	Update turn
+*
+*/
 function updateTurn(t){
 	turn = ( t+1 ) % 2
 	$("#board").removeClass('disabled')
 }
 
+/*
+*
+*	Update the turn and insert the new pawn
+*
+*/
 function updateBoard(msg){
-	console.log(msg)
+	( debug ) ? console.log(msg) : 1
 	turn = msg.turn
-	console.log('Turno:', turn)
+	( debug ) ? console.log('Turno:', turn) : 1
 
 	placePawn( msg.position )
 	updateTurn( turn )
 }
 
+/*
+*
+*	On ready page loads setUpHandlars, wait for other peer connection
+*
+*/
 $(document).ready(function(){
 	/*TODO: dinamically create board here*/
 	createBoard(19)
@@ -238,11 +246,11 @@ $(document).ready(function(){
 	}
 	else{
 		peer = new Peer(myID)
-		console.log('created peer '+ myID)
+		( debug ) ? console.log('created peer '+ myID) : 1
 		turn = 0
 
 		if(otherID != null){
-			console.log("I have to connect with", otherID)
+			( debug ) ? console.log("I have to connect with", otherID) : 1
 			conn = peer.connect(otherID)
 
 			pawnColor = 1
@@ -257,23 +265,23 @@ $(document).ready(function(){
 			
 		}
 		else{
-			console.log('waiting for peer')
+			( debug ) ? console.log('waiting for peer') : 1
 			grayBoard('Waiting for player...')
 
 			pawnColor = 0
 			peer.on('connection', function(c) {
 				conn = c
 				conn.on('open', function() {
-					console.log('established connection')
+					( debug ) ? console.log('established connection') : 1
 					ungrayBoard()
 					sendPOSTforPeerIdEliminationtoServer(myID)
 				})
 
 				conn.on( 'data', function(message){
-					console.log(message)
+					( debug ) ? console.log(message) : 1
 					if(message.id != null){
 						otherID = message.id
-						console.log('connection established with ',otherID,'Turno:',turn,'PawnColor',pawnColor)
+						( debug ) ? console.log('connection established with ',otherID,'Turno:',turn,'PawnColor',pawnColor) : 1
 					}
 					else if( message.turn != null ){
 						updateBoard(message)
@@ -283,3 +291,203 @@ $(document).ready(function(){
 		}
 	}
 })
+
+/*
+*
+*	Place a pawn on the go ban
+*
+*/
+function placePawn(obj){
+	var middle = Math.ceil( obj.length / 2);
+	var x = parseInt(obj.slice(0,middle))-1;
+	var y = parseInt(obj.slice(middle))-1;
+	
+	if( gameBoard [x][y] == 0 ){
+		if( turn == 0 ){
+			if(!checkLiberty(findGroups( new Array(),{'x': x, 'y': y}, 1))) {
+				alert('you\'re killing yourself dude') 
+				return
+			}
+			gameBoard[x][y] = 1;
+			$('#'+obj).find('div:first').css('background-image','url(images/perla_nera.svg)')
+			checkNearGroups ( x, y, 1)
+		}
+		else{
+			if(!checkLiberty(findGroups( new Array(),{'x': x, 'y': y}, 2))) {
+				alert('you\'re killing yourself dude') 
+				return
+			}
+			gameBoard[x][y] = 2;
+			$('#'+obj).find('div:first').css('background-image','url(images/perla_bbianca.svg)')
+			checkNearGroups ( x, y, 2)
+		}
+
+		$('#'+obj).find('div:first').css('visibility','visible');
+		$('#'+obj).unbind('mouseenter mouseleave');
+
+		if(turn == pawnColor) waitForResponse( obj )
+	}
+}   
+
+/*
+*
+*	Finds nearby gruop in all cross direction
+*
+*/
+function findGroups(acc, pos, color){
+	if ( acc === undefined || acc.length == 0){
+		acc.push(pos);
+	}
+	else if ( !acc.some(e => e.x === pos.x && e.y===pos.y) ){
+		acc.push(pos);
+	}
+	else{
+		return acc;
+	}
+
+	if (pos.x + 1 < gameBoard[0].length) {
+		if( gameBoard[pos.x+1][pos.y] == color) {
+			acc=findGroups(acc,{'x':pos.x+1,'y':pos.y},color);
+		}
+	}
+	if( pos.y - 1  > 0 ){
+		if( gameBoard[pos.x][pos.y-1] == color ){
+			acc=findGroups(acc,{'x':pos.x,'y':pos.y-1},color);
+		}
+	}
+
+	if (pos.x - 1 >  0 ){
+		if( gameBoard[pos.x-1][pos.y] == color ){
+			acc=findGroups(acc,{'x':pos.x-1,'y':pos.y},color);
+		}
+	}
+	if( pos.y + 1  < gameBoard[0].length ){
+		if( gameBoard[pos.x][pos.y+1] == color){
+			acc=findGroups(acc,{'x':pos.x,'y':pos.y+1},color);
+		}
+	}
+   
+	( debug )  ? console.log ("End of findgroups ") : 1
+	return acc;
+}
+
+/*
+*
+*	Checks if groups nearby have freedom, if not delete them
+*
+*/
+function  checkNearGroups ( x , y, color ) {
+	var cross = [ -1 , 1]
+
+	for ( i = 0; i < 2 ; i++ ){
+		if ( (i % 2) == 0){
+			cross.forEach ( function ( crossVal ){
+				// se c'è una pedina nella casella della croce  del colore opposto alla tua controlla il suo gruppo
+				if ( x + crossVal < gameBoard[0].length  && x + crossVal >= 0  ){
+					if ( gameBoard[x + crossVal ][y] == ( (color % 2) + 1) ){
+						var group = findGroups( new Array(),{'x': x + crossVal, 'y': y}, ( (color % 2) + 1))
+						if (group != null || group != [] ){
+							if ( ! checkLiberty (group) ){
+								removeGroup(group)
+							}
+						} 
+					}
+				}
+			})
+		}else{ // per le posizioni sopra e sotto
+			cross.forEach ( function ( crossVal ){
+				// se c'è una pedina nella casella della croce  del colore opposto alla tua controlla il suo gruppo
+				if ( y + crossVal < gameBoard[0].length  && y + crossVal >= 0  ){ 
+					if ( gameBoard[x][y + crossVal  ] == ( (color % 2) + 1) ){
+						var group = findGroups( new Array(),{'x': x , 'y': y  + crossVal }, ( (color % 2) + 1))
+					   
+						if (group != null || group != [] ){
+							if ( ! checkLiberty (group) ){
+								removeGroup(group)  
+							}
+						}   
+					} 
+				}
+			})
+		}
+	}
+}
+
+/*
+*
+*	Remove a group and set back css properties of pawn div
+*
+*/
+function removeGroup ( groupies ){
+	for ( var groupie of groupies){
+		//le caselle in groupies sono sfalsate di una riga una colonna perchè partono da 1
+		var xToRemove =  groupie.x
+		var yToRemove =  groupie.y
+		faiBelleXeY(groupie)
+		//ho x e y cerco il div che ha id 'xy'
+		gameBoard[xToRemove][yToRemove] = 0
+		$('#' + groupie.x + groupie.y).find('div:first').css('visibility','hidden')
+		$('#' + groupie.x + groupie.y).hover(function(){
+			if(turn == 0 ){
+				$(this).find('div:first').css('background-image','url(images/perla_nera.svg)');
+			}
+			else{
+				$(this).find('div:first').css('background-image','url(images/perla_bbianca.svg)');
+			}  
+			$(this).find('div:first').css('visibility','visible')
+		},function(){
+			$(this).find('div:first').css('visibility','hidden')}
+		)
+		$('#' + groupie.x + groupie.y).on('click',function(){
+			placePawn(this); 
+		})
+	}
+}
+
+/*
+*
+*	Return a string rappresentation of obj.x++ and obj.y++ as "0Value" if value is below 9 
+*
+*/
+function faiBelleXeY ( obj ){
+	obj.x++
+	obj.y++
+	obj.x = digify(obj.x)
+	obj.y = digify(obj.y)
+}
+
+/*
+*
+*	Return false if the group has no liberties
+*
+*/
+function checkLiberty ( groupies ){
+	for ( var groupie of groupies){
+		var pedina = groupie
+		
+		if (pedina.x + 1 < gameBoard[0].length ){
+			if (gameBoard[pedina.x + 1 ][pedina.y] == 0 ){
+				return true
+			} 
+		}   
+		if (pedina.x - 1 >=   0 ){
+			if (gameBoard[pedina.x - 1 ][pedina.y] == 0 ){
+				return true
+			} 
+		}      
+		if (pedina.y + 1 < gameBoard[0].length ){
+			if (gameBoard[pedina.x][pedina.y + 1 ] == 0 ){
+				return true
+			} 
+		}   
+		if (pedina.y - 1 >=  0 ){
+			if (gameBoard[pedina.x ][pedina.y - 1] == 0 ){
+			   return  true
+			} 
+		}      
+	}
+	return false
+}
+
+
+
