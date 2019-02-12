@@ -6,6 +6,9 @@
 	
     <!-- stylesheet -->
 	<link rel="stylesheet" type="text/css" href="style/styleBoard.css">
+	<link rel="stylesheet" type="text/css" href="style/styleIndex.css">
+	<link rel="stylesheet" type="text/css" href="style/navBar.css">
+	<link rel="stylesheet" type="text/css" href="style/chat.css">
 
 	<!-- JavaScript code -->
 	<script src="js/game.js"></script>
@@ -16,8 +19,34 @@
 	<meta content="">
 </head>
 <body>
-    <div id = 'wrapper'>
-		<div id = 'board'></div>
+	<div class="topnav">
+		<a href="index.html"><div class="active" >
+			<img src="images/logo.svg">
+		</div></a>
+		<a href="rules.html"><div>Rules</div></a>
+		<a href="about.html"><div>About</div></a>
 	</div>
+
+
+	<div class="graypage">
+		<div class="whitepage">
+
+			<div class="gameContainer">
+			<div id = 'wrapper'>
+				<div id = 'board'></div>
+			</div>
+
+			<div class="chat">
+				<div class="container textbox"></div>
+					<div class='container'>
+						<textarea  placeholder = "insert here your message " id="yourMessage" style='border-style:none none solid none; border-color:black; width:100%; display:block;box-sizing:border-box;border-width:1px; margin-bottom:1px;'></textarea>
+						<div style='width:100%; box-sizing:border-box; height:35px;padding:5px;'>
+						<button id="send" style='float:right'>send</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 </body>
 </html>

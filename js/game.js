@@ -4,7 +4,7 @@ var pawnColor
 var urlServer = "http://127.0.0.1:8899"
 var peer,conn,turn
 var debug = true
-
+var dimen = 19
 
 /*
 *
@@ -42,7 +42,7 @@ function waitForResponse( pos ){
 *	Create the correct image for the goban div
 *
 */
-function retrieveImage( cell, x, y, img, dimen ){
+function retrieveImage( cell, x, y, img ){
 	var corner = "url(\""+res + img +"-corner.png\")";
 	var edge = "url(\""+res + img +"-edge.png\")";
 
@@ -91,13 +91,24 @@ function setUpHandlers(){
 		/* rimuovere id dal server */
 		sessionStorage.clear()
 	})
+	$(window).resize(function(){
+		var size = Math.floor($('#board').width()/dimen)
+		$('.row').height(size)
 
+		$('.boardCell').width(size)
+		$('.boardCell').height(size)
+
+		var loc = $('#board').offset()
+		$('#errordiv').css('top', ($('#board').outerHeight()- $('#errordiv').height())/2 + loc.top + 'px')
+		$('#errordiv').css('left', ($('#board').outerWidth() - $('#errordiv').width())/2 + loc.left + 'px')
+	})
 }
 	
-function createBoard(dimen){
+function createBoard(dimension){
+	dimen = dimension
 	var boardW = $('#board').width();
-	
-	var size = boardW/dimen;
+
+	var size = Math.floor(boardW/dimen)
 	gameBoard = new Array(dimen).fill(dimen).map(() => new Array(dimen).fill(0));
 
 	for(var r = 1; r <= dimen; r++){
@@ -105,7 +116,7 @@ function createBoard(dimen){
 		row.className = "row";
 		row.id = "row"+digify(r);
 		row.style.height = size;
-
+		
 		for(var c = 1; c <= dimen; c++){ 
 			/*creating a cell with the relative style*/
 			var cell = document.createElement("div"); 
@@ -114,7 +125,7 @@ function createBoard(dimen){
 			cell.style.backgroundImage = "url(\""+res +"wood1-center.png\")";
 			cell.style.width = size;
 			cell.style.height = size;
-			retrieveImage(cell, r, c, "wood1", dimen);				
+			retrieveImage(cell, r, c, "wood1");				
 			
 			/*creating pawn and appending to the cell*/
 			var pawn = document.createElement('div');
@@ -233,8 +244,7 @@ function updateBoard(msg){
 *
 */
 $(document).ready(function(){
-	/*TODO: dinamically create board here*/
-	createBoard(19)
+	createBoard(dimen)
 
 	setUpHandlers()
 	

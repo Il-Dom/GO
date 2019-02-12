@@ -1,22 +1,22 @@
 #board{
-    width: 760px;
-    height: 760px;
-	display: block;
-	position:absolute;
 	cursor: none;
+	position: relative;
+	background-color: white;
+	margin-right: 10px;
+}
+#wrapper{
+	width: 70%;
+	display: table-cell;
 }
 
 .row{
-    width: 100%;
-    margin: 0;
-    display: block;
-    overflow: hidden;
+	margin: 0 auto;
 	cursor: none;
+	display: table;
 }
-.boardCell{	
-    margin: 0;
-    display: inline-block;
-    /*outline: 1px transparent !important;*/
+
+.boardCell{
+	display: table-cell;
 	background-position:0px 0px;
 	background-repeat:no-repeat;
     -webkit-background-size: cover;
@@ -59,10 +59,7 @@
 	letter-spacing: 2px;
 }
 
-/*
-.pawn-white{
-    background-image:  url(../images/perla_bbianca.svg);
+.gameContainer{
+	display: table; 
+	width:100%;
 }
-.pawn-black{
-    background-image:  url(../images/perla_nera.svg);
-}*/
