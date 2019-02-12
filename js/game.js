@@ -33,7 +33,7 @@ function peerDisconnect(){
 *
 */
 function waitForResponse( pos ){
-	$("#board").addClass('disabled') //.prop('disabled',true).off('click')
+	$(".boardcss").addClass('disabled') //.prop('disabled',true).off('click')
 	conn.send( { 'turn':turn,'position':pos } )
 }
 	
@@ -92,21 +92,29 @@ function setUpHandlers(){
 		sessionStorage.clear()
 	})
 	$(window).resize(function(){
-		var size = Math.floor($('#board').width()/dimen)
+		var boardW = $('.boardcss').width()-5;
+
+		var size = Math.floor(boardW/dimen)
 		$('.row').height(size)
 
 		$('.boardCell').width(size)
 		$('.boardCell').height(size)
 
-		var loc = $('#board').offset()
-		$('#errordiv').css('top', ($('#board').outerHeight()- $('#errordiv').height())/2 + loc.top + 'px')
-		$('#errordiv').css('left', ($('#board').outerWidth() - $('#errordiv').width())/2 + loc.left + 'px')
+		var loc = $('.boardcss').offset()
+		$('#errordiv').css('top', ($('.boardcss').outerHeight()- $('#errordiv').height())/2 + loc.top + 'px')
+		$('#errordiv').css('left', ($('.boardcss').outerWidth() - $('#errordiv').width())/2 + loc.left + 'px')
+
+		$('.chat').height($('#board').height()*0.90)
+		$('.chat').width( ($('.gameContainer').width() -  $('#board').width())*0.9 )
+		$('.chat').css('margin-top', $('.chat').height()*0.05 )
+		$('.chat').css('margin-bottom', $('.chat').height()*0.05 )
+		$('.toInsert').css('font-size', Math.floor($('.row').height()-5)*2) 
 	})
 }
 	
 function createBoard(dimension){
 	dimen = dimension
-	var boardW = $('#board').width();
+	var boardW = $('.boardcss').width()-5;
 
 	var size = Math.floor(boardW/dimen)
 	gameBoard = new Array(dimen).fill(dimen).map(() => new Array(dimen).fill(0));
@@ -158,6 +166,11 @@ function createBoard(dimension){
 		} 
 		board.appendChild(row);
 	}
+
+	$('.chat').height($('#board').height()*0.90)
+	$('.chat').width( ($('.gameContainer').width() -  $('#board').width())*0.9 )
+	$('.chat').css('margin-top', $('.chat').height()*0.05 )
+	$('.chat').css('margin-bottom', $('.chat').height()*0.05 )
 }
 
 /*
@@ -166,15 +179,16 @@ function createBoard(dimension){
 *
 */
 function grayBoard(message){
-	$("#board").addClass('disabled').addClass('grayed')
+	$(".boardcss").addClass('disabled').addClass('grayed')
 	$(".pawn").hide()
 
 	var toInsert = $('<div id=\'errordiv\'>'+message+'</div>')
-	var loc = $('#board').offset()
+	var loc = $('.boardcss').offset()
 	toInsert.appendTo('#wrapper')
 	toInsert.addClass('toInsert')
-	toInsert.css('top', ($('#board').outerHeight()- toInsert.height())/2 + loc.top + 'px')
-	toInsert.css('left', ($('#board').outerWidth() - toInsert.width())/2 + loc.left + 'px')
+	toInsert.css('font-size', Math.floor($('.row').height()-5)*2) 
+	toInsert.css('top', ($('.boardcss').outerHeight()- toInsert.height())/2 + loc.top + 'px')
+	toInsert.css('left', ($('.boardcss').outerWidth() - toInsert.width())/2 + loc.left + 'px')
 }
 
 /*
@@ -183,7 +197,7 @@ function grayBoard(message){
 *
 */
 function ungrayBoard(){
-	$("#board").removeClass('disabled').removeClass('grayed')
+	$(".boardcss").removeClass('disabled').removeClass('grayed')
 	$(".pawn").show()
 	$('#errordiv').remove()
 }
@@ -211,7 +225,7 @@ function sendPOSTforPeerIdEliminationtoServer ( peerToRemove ){
 function onConnectionOpen(mine, other){
 	console.log('Hi ' + other + ' I am '+ mine, 'turn:',turn)
 	conn.send( {'id': mine} )
-	$('#board').addClass('disabled')
+	$('.boardcss').addClass('disabled')
 }
 
 /*
@@ -221,7 +235,7 @@ function onConnectionOpen(mine, other){
 */
 function updateTurn(t){
 	turn = ( t+1 ) % 2
-	$("#board").removeClass('disabled')
+	$(".boardcss").removeClass('disabled')
 }
 
 /*

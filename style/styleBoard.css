@@ -1,22 +1,22 @@
-#board{
+.boardcss{
 	cursor: none;
-	position: relative;
 	background-color: white;
-	margin-right: 10px;
 }
-#wrapper{
+
+.width70{
+	display: inline-block;
 	width: 70%;
-	display: table-cell;
 }
 
 .row{
 	margin: 0 auto;
 	cursor: none;
-	display: table;
+	background-color: white;
 }
 
 .boardCell{
-	display: table-cell;
+	position: relative;
+	float:left;
 	background-position:0px 0px;
 	background-repeat:no-repeat;
     -webkit-background-size: cover;
@@ -54,12 +54,11 @@
 	z-index: 1;
 	position: absolute;
 	opacity: 1; 
-	font-size: 50px;
 	color: black;
 	letter-spacing: 2px;
 }
 
 .gameContainer{
-	display: table; 
 	width:100%;
+	display: inline-block;
 }
