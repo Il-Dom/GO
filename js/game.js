@@ -5,6 +5,9 @@ var urlServer = "http://127.0.0.1:8899"
 var peer,conn,turn
 var debug = true
 var dimen = 19
+var passCounter = 0
+var whiteCaptured = 0;
+var blackCaptured = 0;
 
 /*
 *
@@ -136,11 +139,6 @@ function appendMessageToDiv( msg, type ){
 	messagebox.appendChild(innerDiv)
 	setMinTextSize( $('.divcolor'), 0.4 )
 
-	/*if( $('#messagecontainer').height()*0.05 > 12 )
-		$('.divcolor').css('font-size', $('#messagecontainer').height()*0.05 )
-	else
-		$('.divcolor').css('font-size', 12)*/
-
 	$('#messagecontainer').animate({scrollTop: $('#messagecontainer').prop("scrollHeight")}, 500);
 }
 
@@ -182,6 +180,31 @@ function setUpHandlers(){
 	$('.sendbutton').on('click',function(){
 		sendMessage()
 	})
+
+    $("#turnPass").on('click', function(){
+        if ( !$(".boardcss").attr('class').includes("disabled") ) {
+			console.log("Vuoi passare il turno, il tunto attuale è " + turn )
+			passCounter++
+			checkPassCounter()
+            conn.send( { 'turn' : turn, 'position' : null} )
+			$(".boardcss").addClass('disabled')
+        }
+	})
+    
+	$("#surrender").on('click', function(){
+		console.log("Vuoi abbandonare la partita")
+		if (confirm ("Sei sicuro di voler abbandonare la partita? ") ){
+			conn.send( {'win': true, 'turn' : null, 'position' : null} )
+
+			setTimeout( function(){ 
+				peerDisconnect()
+			}, 1000)
+			location.href = "index.html"
+		}
+	})
+
+    
+    
 }
 	
 function createBoard(dimension){
@@ -313,24 +336,195 @@ function updateTurn(t){
 *
 */
 function updateBoard(msg){
-	turn = msg.turn
 
 	placePawn( msg.position )
 	updateTurn( turn )
 }
 
 function messageSwitcher(msg){
+    //id 
 	if(msg.id != null){
 		otherID = msg.id
 	}
+	//caso generico del passo turno o piazza pedina
 	else if( msg.turn != null ){
-		updateBoard(msg)
-	}
+        turn = msg.turn
+        if (msg.position != null)
+            placePawn( msg.position )
+        else{
+			passCounter++
+			checkPassCounter()
+        }
+		updateTurn( turn )
+        
+    }
+    //quando arriva un messaggoo per la chat
 	else if( msg.msg != null ){
 		appendMessageToDiv( msg.msg, (pawnColor+1)%2 )
 	}
+	
+	// messaggio di vittoria
+	else if ( msg.win != null ){ //&& msg.turn == null && msg.position == null  ){
+        console.log (" l'avversario si è ritirato")
+        if (msg.win == true){
+            alert("congraturation you win") 
+            peerDisconnect()
+            location.href = "index.html"
+        }
+	}
+	
 }
 
+
+
+function listOfGroups(){
+	var groups = {'w': [], 'b': []}
+	for(var x = 0; x < dimen; x++){
+		for(var y = 0; y < dimen; y++){
+			if( gameBoard[x][y] == 1) {
+				var connectedPawns = findGroups( new Array(), {'x': x, 'y': y}, 1 )
+				var found = false
+				for ( var group of groups.b){
+					if(!found)
+					for (var pawn of group){
+						if( pawn.x == connectedPawns[0].x && pawn.y == connectedPawns[0].y ){
+							found = true
+						}
+					}
+				}
+				if(!found){
+					groups.b.push(connectedPawns)
+				}
+			}
+			else if( gameBoard[x][y] == 2){
+				var connectedPawns = findGroups( new Array(), {'x': x, 'y': y}, 2 )
+				var found = false
+				for ( var group of groups.w){
+					if(!found)
+					for (var pawn of group){
+						if( pawn.x == connectedPawns[0].x && pawn.y == connectedPawns[0].y ){
+							found = true
+						}
+					}
+				}
+				if(!found){
+					groups.w.push(connectedPawns)
+				}
+			}
+		}
+	}
+
+	console.log(groups)
+
+	return groups
+}
+
+
+function isPresent(x,y,listLiberties){
+	for(var l of listLiberties){
+		if ( l.x == x && l.y == y){
+			return true
+		}
+	}
+
+	listLiberties.push({'x':x,'y':y})
+	return false
+}
+
+
+function countGruoupLiberties ( whiteList,  blackList ) {
+	var whiteCount = 0 
+	var blackCount = 0
+
+	var liberties = []
+
+	for (var gruppo of whiteList){
+		for ( var pedina of gruppo){
+			if (pedina.x + 1 < gameBoard[0].length ){
+				if (gameBoard[pedina.x + 1 ][pedina.y] == 0 ){
+					if (isPresent(pedina.x+1, pedina.y, liberties) ) {
+						console.log('trovato')
+						whiteCount++
+					}
+				} 
+			}   
+			if (pedina.x - 1 >=   0 ){
+				if (gameBoard[pedina.x - 1 ][pedina.y] == 0 ){
+					if (isPresent(pedina.x-1, pedina.y, liberties) ) {
+						console.log('trovato')
+						whiteCount++
+					}
+				
+				} 
+			}      
+			if (pedina.y + 1 < gameBoard[0].length ){
+				if (gameBoard[pedina.x][pedina.y + 1 ] == 0 ){
+					if (isPresent(pedina.x, pedina.y+1, liberties) ) {
+						console.log('trovato')
+						whiteCount++
+					}
+				 
+				} 
+			}   
+			if (pedina.y - 1 >=  0 ){
+				if (gameBoard[pedina.x ][pedina.y - 1] == 0 ){
+					if (isPresent(pedina.x, pedina.y-1, liberties) ){
+						console.log('trovato')
+						whiteCount++
+					}
+				} 
+			}      
+		}
+	}
+
+	for (var gruppo of blackList){
+		for ( var pedina of gruppo){
+	
+			if (pedina.x + 1 < gameBoard[0].length ){
+				if (gameBoard[pedina.x + 1 ][pedina.y] == 0 ){
+					blackCount++
+				} 
+			}   
+			if (pedina.x - 1 >=   0 ){
+				if (gameBoard[pedina.x - 1 ][pedina.y] == 0 ){
+					blackCount++
+				} 
+			}      
+			if (pedina.y + 1 < gameBoard[0].length ){
+				if (gameBoard[pedina.x][pedina.y + 1 ] == 0 ){
+					blackCount++
+				} 
+			}   
+			if (pedina.y - 1 >=  0 ){
+				if (gameBoard[pedina.x ][pedina.y - 1] == 0 ){
+					blackCount++
+				} 
+			}      
+		}
+	}
+	console.log(whiteCount,blackCount)
+	return  { 'wCount' : whiteCount, 'bCount' : blackCount}
+}
+
+
+function checkPassCounter () {
+	console.log(passCounter)
+	if (passCounter == 2 ){
+		console.log (" Eseguire ordine 66 ")
+		var groups = listOfGroups()
+		console.log(groups)
+		// conto le liberta di tutti i gruppi
+		var groupLibCounter =  countGruoupLiberties ( groups.w, groups.b)
+		var libertabianche = groupLibCounter.wCount
+		var libertanere = groupLibCounter.bCount
+		//sottraggo le pedine perse
+		var totbianco = libertabianche - whiteCaptured
+		var totnero = libertanere - blackCaptured
+		console.log ( "totale nero:  " + totnero + "totale bianco:  " +  totbianco)
+	}
+
+
+}
 /*
 *
 *	On ready page loads setUpHandlars, wait for other peer connection
@@ -414,6 +608,8 @@ function placePawn(obj){
 
 		if(turn == pawnColor) waitForResponse( obj )
 	}
+
+	passCounter = 0
 }   
 
 /*
@@ -474,6 +670,8 @@ function  checkNearGroups ( x , y, color ) {
 						var group = findGroups( new Array(),{'x': x + crossVal, 'y': y}, ( (color % 2) + 1))
 						if (group != null || group != [] ){
 							if ( ! checkLiberty (group) ){
+								if( color == 1 ) whiteCaptured += group.length
+								else if( color == 2 ) blackCaptured += group.length
 								removeGroup(group)
 							}
 						} 
@@ -489,6 +687,8 @@ function  checkNearGroups ( x , y, color ) {
 					   
 						if (group != null || group != [] ){
 							if ( ! checkLiberty (group) ){
+								if( color == 1 ) whiteCaptured += group.length
+								else if( color == 2 ) blackCaptured += group.length
 								removeGroup(group)  
 							}
 						}   
