@@ -78,6 +78,30 @@ function retrieveImage( cell, x, y, img ){
 	}
 }
 
+
+function responsiveBehaviour(){
+	var boardW = $('.boardcss').width()-5;
+
+	var size = Math.floor(boardW/dimen)
+	$('.row').height(size)
+
+	$('.boardCell').width(size)
+	$('.boardCell').height(size)
+
+	var loc = $('.boardcss').offset()
+	$('#errordiv').css('top', ($('.boardcss').outerHeight()- $('#errordiv').height())/2 + loc.top + 'px')
+	$('#errordiv').css('left', ($('.boardcss').outerWidth() - $('#errordiv').width())/2 + loc.left + 'px')
+
+	$('.chat').height($('#board').height()*0.90)
+	$('.chat').width( ($('.gameContainer').width() -  $('#board').width())*0.9 )
+	$('.chat').css('margin-top', $('.chat').height()*0.05 )
+	$('.chat').css('margin-bottom', $('.chat').height()*0.05 )
+
+	$('.sendbutton').css('font-size',$('.buttondiv').height()*0.7)
+
+	$('.toInsert').css('font-size', Math.floor($('.row').height()-5)*2) 
+}
+
 /*
 *
 *	Setup page handlers
@@ -92,23 +116,7 @@ function setUpHandlers(){
 		sessionStorage.clear()
 	})
 	$(window).resize(function(){
-		var boardW = $('.boardcss').width()-5;
-
-		var size = Math.floor(boardW/dimen)
-		$('.row').height(size)
-
-		$('.boardCell').width(size)
-		$('.boardCell').height(size)
-
-		var loc = $('.boardcss').offset()
-		$('#errordiv').css('top', ($('.boardcss').outerHeight()- $('#errordiv').height())/2 + loc.top + 'px')
-		$('#errordiv').css('left', ($('.boardcss').outerWidth() - $('#errordiv').width())/2 + loc.left + 'px')
-
-		$('.chat').height($('#board').height()*0.90)
-		$('.chat').width( ($('.gameContainer').width() -  $('#board').width())*0.9 )
-		$('.chat').css('margin-top', $('.chat').height()*0.05 )
-		$('.chat').css('margin-bottom', $('.chat').height()*0.05 )
-		$('.toInsert').css('font-size', Math.floor($('.row').height()-5)*2) 
+		responsiveBehaviour()
 	})
 }
 	
@@ -167,10 +175,7 @@ function createBoard(dimension){
 		board.appendChild(row);
 	}
 
-	$('.chat').height($('#board').height()*0.90)
-	$('.chat').width( ($('.gameContainer').width() -  $('#board').width())*0.9 )
-	$('.chat').css('margin-top', $('.chat').height()*0.05 )
-	$('.chat').css('margin-bottom', $('.chat').height()*0.05 )
+	responsiveBehaviour()
 }
 
 /*
@@ -244,9 +249,7 @@ function updateTurn(t){
 *
 */
 function updateBoard(msg){
-	( debug ) ? console.log(msg) : 1
 	turn = msg.turn
-	( debug ) ? console.log('Turno:', turn) : 1
 
 	placePawn( msg.position )
 	updateTurn( turn )
@@ -270,11 +273,9 @@ $(document).ready(function(){
 	}
 	else{
 		peer = new Peer(myID)
-		( debug ) ? console.log('created peer '+ myID) : 1
 		turn = 0
 
 		if(otherID != null){
-			( debug ) ? console.log("I have to connect with", otherID) : 1
 			conn = peer.connect(otherID)
 
 			pawnColor = 1
@@ -289,23 +290,19 @@ $(document).ready(function(){
 			
 		}
 		else{
-			( debug ) ? console.log('waiting for peer') : 1
 			grayBoard('Waiting for player...')
 
 			pawnColor = 0
 			peer.on('connection', function(c) {
 				conn = c
 				conn.on('open', function() {
-					( debug ) ? console.log('established connection') : 1
 					ungrayBoard()
 					sendPOSTforPeerIdEliminationtoServer(myID)
 				})
 
 				conn.on( 'data', function(message){
-					( debug ) ? console.log(message) : 1
 					if(message.id != null){
 						otherID = message.id
-						( debug ) ? console.log('connection established with ',otherID,'Turno:',turn,'PawnColor',pawnColor) : 1
 					}
 					else if( message.turn != null ){
 						updateBoard(message)
@@ -391,7 +388,6 @@ function findGroups(acc, pos, color){
 		}
 	}
    
-	( debug )  ? console.log ("End of findgroups ") : 1
 	return acc;
 }
 

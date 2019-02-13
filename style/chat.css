@@ -3,12 +3,13 @@
 	background-color: #eeeeee;
 	border-radius: 5px;
 	width: 100%;
-	margin: 0;
+	margin: 2px 0 0 0;
 	height: 20%;
 }
 .textbox {
 	overflow-y: scroll;
 	height: 80%;
+	margin-top: 0;
 }
 
 .chat{
@@ -17,24 +18,53 @@
 }
 
 #yourMessage{
-	border: 2px solid #9e9e9e;
-	background-color: #f1f1f1;
+	border: 2px #9e9e9e;
+	border-style: none none solid none; 
+	border-width:1px;
 	border-radius: 5px;
-	padding: 10px;
-	margin: 10px 0;
+	background-color: #f1f1f1;
+	padding: 5px;
+	margin: 0 0;
+	width:100%; 
+	display:block;
+	box-sizing:border-box;
 }
+
 textarea{
-	-moz-text-align-last: center; /* Firefox 12+ */
-	text-align-last: center;
+	font-family: sans-serif;
 	border: 0px solid #dedede;
-	background-color: #f1f1f1;
 	border-radius: 5px;
+	background-color: #f1f1f1;
 	padding: 0px;
 	margin-top: auto;
 	margin-bottom: auto;
+	height: 80%;
 	resize: none;
 	white-space: normal;
-	font-family: sans-serif;
+}
+
+textarea:focus{
+	outline:none;
+}
+
+.buttondiv{
+	width:100%; 
+	box-sizing:border-box; 
+	height: calc(20% - 2px);
+	max-height: 20px;
+	margin: 1px 0 1px 0;
+}
+
+.sendbutton{
+	height: 100%;
+	background-color: rgb(126, 126, 126); /* Green */
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	float:right;
+	border-radius: 8px;
+	margin-right: 2px;
 }
 
 /* Darker chat container */
@@ -56,7 +86,7 @@ textarea{
 	text-align: end;
 }
 
-/* Clear floats
+/* Clear floats*/
 .container::after {
 	content: "";
 	clear: both;
@@ -89,18 +119,4 @@ textarea{
 .time-left {
 	float: left;
 	color: #999;
-}
-
-button {
-	background-color: rgb(126, 126, 126); /* Green */
-	border: none;
-	color: white;
-	padding: 5px 5px;
-	text-align: center;
-	margin-top: auto;
-	margin-bottom: auto;
-	text-decoration: none;
-	display: inline-block;
-	font-size: 12px;
-	border-radius: 8px;
 }

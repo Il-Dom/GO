@@ -46,16 +46,18 @@ body{
 	background-image: url(../images/hostgame.svg);
 
 	display: table-cell;
-  vertical-align: middle;
+  	vertical-align: middle;
 
-  /* Reset */
-  float: none;
-  line-height: normal;
+	/* Reset */
+	float: none;
+	line-height: normal;
 }
+
 #createHost:hover{
 	box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.4);
 	transform: scale(1.05);
 }
+
 #createHost:focus{
 	outline:none;
 }
@@ -65,6 +67,7 @@ body{
 	height: auto;
 	background-color: #f3f3f3;
 }
+
 .whitepage{
 	margin-left:10%;
 	width:80%;
@@ -74,6 +77,7 @@ body{
 	background-color: #ffffff;
 	overflow: auto;
 }
+
 .divContainer{
 	height: 250px;
 	overflow:visible;
@@ -82,10 +86,12 @@ body{
 #toggle-host{
 	display: block;
 }
+
 #toggle-play{
 	display: block;
 	margin-bottom: 10px;
 }
+
 .infodiv{
 	height: auto;
 	display: flex;
@@ -112,6 +118,7 @@ body{
 .gridCell:hover{
 	cursor: pointer;
 }
+
 /*material buttons*/
 .group{
 	position: relative; 
@@ -149,7 +156,7 @@ input:focus ~ label, input:valid ~ label 		{
   color:#5264AE;
 }
 
-.bar 	{ 
+.bar { 
 	position:relative; 
 	display:block; 
 	width:300px; 
