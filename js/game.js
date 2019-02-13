@@ -79,6 +79,13 @@ function retrieveImage( cell, x, y, img ){
 }
 
 
+function setMinTextSize( obj, percentage ){
+	if( $('.yourMessage').height()*0.3 > 12 )
+		obj.css('font-size', $('.yourMessage').height()*percentage )
+	else
+		obj.css('font-size', 12)
+}
+
 function responsiveBehaviour(){
 	var boardW = $('.boardcss').width()-5;
 
@@ -87,19 +94,72 @@ function responsiveBehaviour(){
 
 	$('.boardCell').width(size)
 	$('.boardCell').height(size)
+	$('.pawn').width(size)
+	$('.pawn').height(size)
 
 	var loc = $('.boardcss').offset()
 	$('#errordiv').css('top', ($('.boardcss').outerHeight()- $('#errordiv').height())/2 + loc.top + 'px')
 	$('#errordiv').css('left', ($('.boardcss').outerWidth() - $('#errordiv').width())/2 + loc.left + 'px')
 
-	$('.chat').height($('#board').height()*0.90)
+	$('.chat').height( $('#board').height()*0.90 )
 	$('.chat').width( ($('.gameContainer').width() -  $('#board').width())*0.9 )
-	$('.chat').css('margin-top', $('.chat').height()*0.05 )
+	$('.chat').css('margin-top', $('.chat').height()*0.04 )
 	$('.chat').css('margin-bottom', $('.chat').height()*0.05 )
 
-	$('.sendbutton').css('font-size',$('.buttondiv').height()*0.7)
+	$('.buttondiv').css('padding-top', ($('.buttondiv').height() - $('.sendbutton').height())/2 -1 )
+	$('.buttondiv').css('padding-bottom', ($('.buttondiv').height() - $('.sendbutton').height())/2 -1)
 
+	setMinTextSize( $('.yourMessage'), 0.3 )
+	setMinTextSize( $('.divcolor'), 0.4 )
+
+	$('textarea').css('height', '70%')
+	$('.yourMessage').attr("placeholder")
+
+	$('.sendbutton').css('font-size', Math.floor($('.buttondiv').height()*0.5) )
 	$('.toInsert').css('font-size', Math.floor($('.row').height()-5)*2) 
+}
+
+
+function appendMessageToDiv( msg, type ){
+	var messagebox = document.getElementById('messagecontainer')
+	
+	var innerDiv = document.createElement('div')
+	innerDiv.className = "divcolor"
+
+	if( !type ){
+		innerDiv.className += ' darker'
+	}
+	else
+		innerDiv.className += ' clear'
+	innerDiv.textContent += msg
+	
+	messagebox.appendChild(innerDiv)
+	setMinTextSize( $('.divcolor'), 0.4 )
+
+	/*if( $('#messagecontainer').height()*0.05 > 12 )
+		$('.divcolor').css('font-size', $('#messagecontainer').height()*0.05 )
+	else
+		$('.divcolor').css('font-size', 12)*/
+
+	$('#messagecontainer').animate({scrollTop: $('#messagecontainer').prop("scrollHeight")}, 500);
+}
+
+function sendMessage(){
+	if(conn){
+		conn.send( { 'msg': $('.yourMessage').val() } )
+		appendMessageToDiv($('.yourMessage').val(), pawnColor )
+		$('.yourMessage').val('')
+	}
+	else{
+		$('.yourMessage').val('')
+		$('.yourMessage').attr("placeholder", "No peer connected");
+		$('.yourMessage').addClass('redMessage')
+
+		setTimeout(function(){
+			$('.yourMessage').attr("placeholder", "Insert here your message");
+			$('.yourMessage').removeClass('redMessage')
+		},2000)
+	}
 }
 
 /*
@@ -117,6 +177,10 @@ function setUpHandlers(){
 	})
 	$(window).resize(function(){
 		responsiveBehaviour()
+	})
+
+	$('.sendbutton').on('click',function(){
+		sendMessage()
 	})
 }
 	
@@ -255,6 +319,18 @@ function updateBoard(msg){
 	updateTurn( turn )
 }
 
+function messageSwitcher(msg){
+	if(msg.id != null){
+		otherID = msg.id
+	}
+	else if( msg.turn != null ){
+		updateBoard(msg)
+	}
+	else if( msg.msg != null ){
+		appendMessageToDiv( msg.msg, (pawnColor+1)%2 )
+	}
+}
+
 /*
 *
 *	On ready page loads setUpHandlars, wait for other peer connection
@@ -279,15 +355,10 @@ $(document).ready(function(){
 			conn = peer.connect(otherID)
 
 			pawnColor = 1
-
 			conn.on( 'open', function() {onConnectionOpen(myID,otherID)} )
-
 			conn.on('data', function(message){
-				if(message.turn != null){
-					updateBoard(message)
-				}
+				messageSwitcher(message)
 			})
-			
 		}
 		else{
 			grayBoard('Waiting for player...')
@@ -301,12 +372,7 @@ $(document).ready(function(){
 				})
 
 				conn.on( 'data', function(message){
-					if(message.id != null){
-						otherID = message.id
-					}
-					else if( message.turn != null ){
-						updateBoard(message)
-					}
+					messageSwitcher(message)
 				});
 			})
 		}

@@ -1,14 +1,14 @@
 .container {
 	border: 2px solid #9e9e9e;  /* qua sono i 2 pixel che sfalsano */
-	background-color: #eeeeee;
+	background-color: #ffffff;
 	border-radius: 5px;
 	width: 100%;
 	margin: 2px 0 0 0;
-	height: 20%;
+	height: 15%;
 }
 .textbox {
 	overflow-y: scroll;
-	height: 80%;
+	height: 85%;
 	margin-top: 0;
 }
 
@@ -17,12 +17,12 @@
 	vertical-align: top;
 }
 
-#yourMessage{
+.yourMessage{
 	border: 2px #9e9e9e;
 	border-style: none none solid none; 
 	border-width:1px;
 	border-radius: 5px;
-	background-color: #f1f1f1;
+	background-color: #ffffff;
 	padding: 5px;
 	margin: 0 0;
 	width:100%; 
@@ -30,15 +30,19 @@
 	box-sizing:border-box;
 }
 
+.redMessage::-webkit-input-placeholder {
+	color: red;
+}
+
 textarea{
 	font-family: sans-serif;
 	border: 0px solid #dedede;
-	border-radius: 5px;
+	border-radius: 8px;
 	background-color: #f1f1f1;
 	padding: 0px;
 	margin-top: auto;
 	margin-bottom: auto;
-	height: 80%;
+	height: 70%;
 	resize: none;
 	white-space: normal;
 }
@@ -50,9 +54,7 @@ textarea:focus{
 .buttondiv{
 	width:100%; 
 	box-sizing:border-box; 
-	height: calc(20% - 2px);
-	max-height: 20px;
-	margin: 1px 0 1px 0;
+	height: calc(30%);
 }
 
 .sendbutton{
@@ -65,35 +67,51 @@ textarea:focus{
 	float:right;
 	border-radius: 8px;
 	margin-right: 2px;
+	max-height: 20px;
 }
+.sendbutton:focus{
+	outline:none;
+}
+
 
 /* Darker chat container */
-.darker {
-	border: 2px solid #dbdbdb;
-	border-radius: 5px;
-	padding: 10px;
-	margin: 10px 0;
-	border-color: rgb(128, 128, 128);
-	background-color: rgb(100, 100, 100);
-}
-.clear {
-	border: 2px solid #dbdbdb;
-	border-radius: 5px;
-	padding: 10px;
-	margin: 10px 0;
-	border-color: rgb(87, 87, 87);
-	background-color: rgb(221, 220, 220);
-	text-align: end;
+.divcolor{
+	border-top: 2px solid #dbdbdb;
+	border-bottom: 2px solid #dbdbdb;
+	border-radius: 8px;
+	padding: 5px;
+	margin: 5px 2px;
+	cursor: pointer;
+	border-color: rgb(99,99,99);
+	word-wrap: break-word;
+	overflow: hidden;
+	font-size: 20px;
 }
 
-/* Clear floats*/
+.divcolor::after{
+	content: "";
+	display: inline-block;
+	width: 100%;
+}
+
+.darker {
+	background-color: rgb(128, 128, 128);
+	color:white;
+}
+
+.clear {
+	background-color: white;
+	text-align: right;
+}
+
+/* Clear floats
 .container::after {
 	content: "";
 	clear: both;
 	display: table;
 }
 
-/* Style images */
+/* Style images
 .container img {
 	float: left;
 	max-width: 60px;
@@ -102,21 +120,22 @@ textarea:focus{
 	border-radius: 50%;
 }
 
-/* Style the right image */
+/* Style the right image 
 .container img.right {
 	float: right;
 	margin-left: 20px;
 	margin-right:0;
 }
 
-/* Style time text */
+/* Style time text 
 .time-right {
 	float: right;
 	color: #aaa;
 }
 
-/* Style time text */
+/* Style time text 
 .time-left {
 	float: left;
 	color: #999;
 }
+*/
