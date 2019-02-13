@@ -426,8 +426,7 @@ function isPresent(x,y,listLiberties){
 			return true
 		}
 	}
-
-	listLiberties.push({'x':x,'y':y})
+	listLiberties.push({'x':x, 'y':y})
 	return false
 }
 
@@ -440,66 +439,37 @@ function countGruoupLiberties ( whiteList,  blackList ) {
 
 	for (var gruppo of whiteList){
 		for ( var pedina of gruppo){
-			if (pedina.x + 1 < gameBoard[0].length ){
-				if (gameBoard[pedina.x + 1 ][pedina.y] == 0 ){
-					if (isPresent(pedina.x+1, pedina.y, liberties) ) {
-						console.log('trovato')
-						whiteCount++
-					}
-				} 
+			if (pedina.x + 1 < gameBoard[0].length && gameBoard[pedina.x + 1 ][pedina.y] == 0 && !isPresent(pedina.x+1, pedina.y, liberties) ) {
+				whiteCount++
 			}   
-			if (pedina.x - 1 >=   0 ){
-				if (gameBoard[pedina.x - 1 ][pedina.y] == 0 ){
-					if (isPresent(pedina.x-1, pedina.y, liberties) ) {
-						console.log('trovato')
-						whiteCount++
-					}
-				
-				} 
+			if (pedina.x - 1 >= 0 && gameBoard[pedina.x-1 ][pedina.y] == 0 && !isPresent(pedina.x-1, pedina.y, liberties) ) {
+				whiteCount++
 			}      
-			if (pedina.y + 1 < gameBoard[0].length ){
-				if (gameBoard[pedina.x][pedina.y + 1 ] == 0 ){
-					if (isPresent(pedina.x, pedina.y+1, liberties) ) {
-						console.log('trovato')
-						whiteCount++
-					}
-				 
-				} 
+			if (pedina.y + 1 < gameBoard[0].length && gameBoard[pedina.x][pedina.y + 1 ] == 0 &&  !isPresent(pedina.x, pedina.y+1, liberties) ) {
+				whiteCount++
 			}   
-			if (pedina.y - 1 >=  0 ){
-				if (gameBoard[pedina.x ][pedina.y - 1] == 0 ){
-					if (isPresent(pedina.x, pedina.y-1, liberties) ){
-						console.log('trovato')
-						whiteCount++
-					}
-				} 
-			}      
+			if (pedina.y - 1 >= 0 && gameBoard[pedina.x][pedina.y - 1] == 0 && !isPresent(pedina.x, pedina.y-1, liberties) ){
+				whiteCount++
+			}
 		}
 	}
 
+	liberties = []
+
 	for (var gruppo of blackList){
 		for ( var pedina of gruppo){
-	
-			if (pedina.x + 1 < gameBoard[0].length ){
-				if (gameBoard[pedina.x + 1 ][pedina.y] == 0 ){
-					blackCount++
-				} 
+			if (pedina.x+1 < gameBoard[0].length && gameBoard[pedina.x+1][pedina.y] == 0 && !isPresent(pedina.x+1, pedina.y, liberties) ){
+				blackCount++
 			}   
-			if (pedina.x - 1 >=   0 ){
-				if (gameBoard[pedina.x - 1 ][pedina.y] == 0 ){
-					blackCount++
-				} 
+			if (pedina.x - 1 >=  0 && gameBoard[pedina.x - 1 ][pedina.y] == 0 && !isPresent(pedina.x-1, pedina.y, liberties) ){
+				blackCount++	
 			}      
-			if (pedina.y + 1 < gameBoard[0].length ){
-				if (gameBoard[pedina.x][pedina.y + 1 ] == 0 ){
-					blackCount++
-				} 
+			if (pedina.y + 1 < gameBoard[0].length && gameBoard[pedina.x][pedina.y + 1 ] == 0 && !isPresent(pedina.x, pedina.y+1, liberties) ){
+				blackCount++				
 			}   
-			if (pedina.y - 1 >=  0 ){
-				if (gameBoard[pedina.x ][pedina.y - 1] == 0 ){
-					blackCount++
-				} 
-			}      
+			if (pedina.y - 1>=0 && gameBoard[pedina.x ][pedina.y-1] == 0 && !isPresent(pedina.x, pedina.y-1, liberties) ){
+				blackCount++
+			}  
 		}
 	}
 	console.log(whiteCount,blackCount)
