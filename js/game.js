@@ -115,6 +115,7 @@ function responsiveBehaviour(){
 
 	setMinTextSize( $('.yourMessage'), 0.3 )
 	setMinTextSize( $('.divcolor'), 0.4 )
+	setMinTextSize( $('.infobox'), 0.4 )
 
 	$('textarea').css('height', '70%')
 	$('.yourMessage').attr("placeholder")
@@ -542,24 +543,24 @@ function checkPassCounter () {
 		console.log ( "totale nero:  " + totnero + "totale bianco:  " +  totbianco)
 		if (pawnColor == 0){
 			if (totnero > totbianco){
-				alert( "Congratulations you WIN")
+				alert( "Congratulations you WIN. Your points: " + totnero+ " enemy points " + totbianco )
 				location.href = "index.html"
 			}else if (totnero < totbianco ) {
-				alert( "Sorry you LOST")
+				alert( "Sorry you LOST. Your points: " + totnero+ " enemy points " + totbianco )
 				location.href = "index.html"
 			}else {
-				alert( "It's a draw")
+				alert( "It's a draw. Enemy points and yours: "+ totnero)
 				location.href = "index.html"
 			}
 		}else if (pawnColor == 1){
 			if (totnero <  totbianco){
-				alert( "Congratulations you WIN")
+				alert( "Congratulations you WIN. Your points: " + totbianco + " enemy points " + totnero )
 				location.href = "index.html"
 			}else if ( totnero >   totbianco) {
-				alert( "Sorry you LOST")
+				alert( "Sorry you LOST. Your points: " + totbianco + " enemy points " + totnero)
 				location.href = "index.html"
 			}else {
-				alert( "It's a draw")
+				alert( "It's a draw. Enemy points and yours: " + totnero)
 				location.href = "index.html"
 			}
 		}
