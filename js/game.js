@@ -38,6 +38,7 @@ function peerDisconnect(){
 function waitForResponse( pos ){
 	$(".boardcss").addClass('disabled') //.prop('disabled',true).off('click')
 	conn.send( { 'turn':turn,'position':pos } )
+	updatePawnIcon((turn+1)%2)
 }
 	
 /*
@@ -119,7 +120,16 @@ function responsiveBehaviour(){
 	$('.yourMessage').attr("placeholder")
 
 	$('.sendbutton').css('font-size', Math.floor($('.buttondiv').height()*0.5) )
+	$('.sendbutton').css('margin-top', Math.floor( ($('.buttondiv').height() - $('.sendbutton').height())/2 ) )
+
 	$('.toInsert').css('font-size', Math.floor($('.row').height()-5)*2) 
+
+	if ( $('.gameContainer').height() > window.innerHeight - 51){
+		$('.whitepage').height( $('.gameContainer').height() ) 
+	}
+	else{
+		$('.whitepage').height( window.innerHeight - 51)
+	}
 }
 
 
@@ -127,15 +137,21 @@ function appendMessageToDiv( msg, type ){
 	var messagebox = document.getElementById('messagecontainer')
 	
 	var innerDiv = document.createElement('div')
-	innerDiv.className = "divcolor"
-
-	if( !type ){
-		innerDiv.className += ' darker'
+	if(type == 'info'){
+		console.log('infomessage')
+		innerDiv.className = 'infobox'
 	}
-	else
-		innerDiv.className += ' clear'
-	innerDiv.textContent += msg
+	else{
+		innerDiv.className = "divcolor"
+
+		if( !type ){
+			innerDiv.className += ' darker'
+		}
+		else
+			innerDiv.className += ' clear'
+	}
 	
+	innerDiv.textContent += msg
 	messagebox.appendChild(innerDiv)
 	setMinTextSize( $('.divcolor'), 0.4 )
 
@@ -186,7 +202,8 @@ function setUpHandlers(){
 			console.log("Vuoi passare il turno, il tunto attuale è " + turn )
 			passCounter++
 			checkPassCounter()
-            conn.send( { 'turn' : turn, 'position' : null} )
+			conn.send( { 'turn' : turn, 'position' : null} )		
+			updatePawnIcon((turn+1)%2)
 			$(".boardcss").addClass('disabled')
         }
 	})
@@ -202,6 +219,16 @@ function setUpHandlers(){
 			location.href = "index.html"
 		}
 	})
+
+	$(".yourMessage").bind("keypress", {}, keypressInBox);	
+    
+    function keypressInBox(e) {
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if (code == 13) { //Enter keycode                        
+            e.preventDefault();
+            sendMessage()
+        }
+    };
 
     
     
@@ -292,6 +319,7 @@ function ungrayBoard(){
 	$(".boardcss").removeClass('disabled').removeClass('grayed')
 	$(".pawn").show()
 	$('#errordiv').remove()
+	$('.turnDiv').css('visibility','visible')
 }
 
 /*
@@ -320,6 +348,16 @@ function onConnectionOpen(mine, other){
 	$('.boardcss').addClass('disabled')
 }
 
+
+function updatePawnIcon(t){
+	if ( !t ){
+		$('.pawnTurn').css('background-image','url(images/perla_nera.svg)')
+	}
+	else{
+		$('.pawnTurn').css('background-image','url(images/perla_bbianca.svg)')
+	}
+}
+
 /*
 *
 *	Update turn
@@ -327,6 +365,7 @@ function onConnectionOpen(mine, other){
 */
 function updateTurn(t){
 	turn = ( t+1 ) % 2
+	updatePawnIcon(turn)
 	$(".boardcss").removeClass('disabled')
 }
 
@@ -334,12 +373,11 @@ function updateTurn(t){
 *
 *	Update the turn and insert the new pawn
 *
-*/
-function updateBoard(msg){
 
+function updateBoard(msg){
 	placePawn( msg.position )
 	updateTurn( turn )
-}
+}*/
 
 function messageSwitcher(msg){
     //id 
@@ -352,11 +390,11 @@ function messageSwitcher(msg){
         if (msg.position != null)
             placePawn( msg.position )
         else{
+			appendMessageToDiv('The other player passed his turn', 'info')
 			passCounter++
 			checkPassCounter()
-        }
+		}
 		updateTurn( turn )
-        
     }
     //quando arriva un messaggoo per la chat
 	else if( msg.msg != null ){
@@ -491,6 +529,30 @@ function checkPassCounter () {
 		var totbianco = libertabianche - whiteCaptured
 		var totnero = libertanere - blackCaptured
 		console.log ( "totale nero:  " + totnero + "totale bianco:  " +  totbianco)
+		if (pawnColor == 0){
+			if (totnero > totbianco){
+				alert( "Congratulations you WIN")
+				location.href = "index.html"
+			}else if (totnero < totbianco ) {
+				alert( "Sorry you LOST")
+				location.href = "index.html"
+			}else {
+				alert( "It's a draw")
+				location.href = "index.html"
+			}
+		}else if (pawnColor == 1){
+			if (totnero <  totbianco){
+				alert( "Congratulations you WIN")
+				location.href = "index.html"
+			}else if ( totnero >   totbianco) {
+				alert( "Sorry you LOST")
+				location.href = "index.html"
+			}else {
+				alert( "It's a draw")
+				location.href = "index.html"
+			}
+		}
+		
 	}
 
 
@@ -519,7 +581,12 @@ $(document).ready(function(){
 			conn = peer.connect(otherID)
 
 			pawnColor = 1
-			conn.on( 'open', function() {onConnectionOpen(myID,otherID)} )
+			conn.on( 'open', function() {
+				onConnectionOpen(myID,otherID)
+				appendMessageToDiv('you have white pawns', 'info')
+				$('.turnDiv').css('visibility','visible')
+				updatePawnIcon(turn)
+			})
 			conn.on('data', function(message){
 				messageSwitcher(message)
 			})
@@ -533,7 +600,10 @@ $(document).ready(function(){
 				conn.on('open', function() {
 					ungrayBoard()
 					sendPOSTforPeerIdEliminationtoServer(myID)
+					appendMessageToDiv('you have black pawns', 'info')
+					updatePawnIcon(turn)
 				})
+				
 
 				conn.on( 'data', function(message){
 					messageSwitcher(message)
@@ -578,7 +648,6 @@ function placePawn(obj){
 
 		if(turn == pawnColor) waitForResponse( obj )
 	}
-
 	passCounter = 0
 }   
 

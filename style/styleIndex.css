@@ -1,9 +1,8 @@
-html{
-	overflow: hidden;
-}
 body{
-	margin: 0px;
+	margin: 0px;	
+	min-height: 100%;
 }
+
 
 .buttonContainer{
 	width: 250px;
@@ -64,18 +63,17 @@ body{
 
 .graypage{
 	width: 100%;
-	height: auto;
 	background-color: #f3f3f3;
 }
 
 .whitepage{
 	margin-left:10%;
 	width:80%;
-	height:100%;
 	border: 1px solid #ccc;
 	border-top: 0px;
 	background-color: #ffffff;
-	overflow: auto;
+	display: block;
+	overflow: hidden;
 }
 
 .divContainer{
@@ -220,6 +218,6 @@ input:focus ~ .highlight {
 video{
 	display: block;
 	margin: 0 auto;
-	width: 75% !important;
-	max-width:75%;
+	width: 65% !important;
+	max-width:65%;
 }

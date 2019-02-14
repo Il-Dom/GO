@@ -207,7 +207,8 @@ $(document).ready(function(){
 	video.load()
 	video.play()
 
-
+	$('html').css('overflow','hidden');
+	$('.whitepage').css('height','100%')
     $('#infoplayer').css('display','grid').css( 'grid-template-columns',' auto auto')
 	setupHandlers()
 });
