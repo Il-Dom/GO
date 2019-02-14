@@ -182,13 +182,25 @@ function sendMessage(){
 *
 */
 function setUpHandlers(){
-	$(document).unload(function () {
-		peerDisconnect();
-	})
+	
+	$(window).on('beforeunload', function(){
+		
+		/* rimuovere id dal server */
+		sendPOSTforPeerIdEliminationtoServer(peer.id)	
+		if(conn != null) conn.send( {'win': true, 'turn' : null, 'position' : null} )
+	
+		sessionStorage.clear()
+	})	
+	
+
 	$(window).unload(function(){
 		/* rimuovere id dal server */
+		sendPOSTforPeerIdEliminationtoServer(peer.id)	
+		if(conn != null) conn.send( {'win': true, 'turn' : null, 'position' : null} )
+	
 		sessionStorage.clear()
 	})
+    
 	$(window).resize(function(){
 		responsiveBehaviour()
 	})
@@ -403,9 +415,8 @@ function messageSwitcher(msg){
 	
 	// messaggio di vittoria
 	else if ( msg.win != null ){ //&& msg.turn == null && msg.position == null  ){
-        console.log (" l'avversario si è ritirato")
         if (msg.win == true){
-            alert("congraturation you win") 
+           alert("The other player left the game, you WIN") 
             peerDisconnect()
             location.href = "index.html"
         }
